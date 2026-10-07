@@ -1,0 +1,172 @@
+@import "tailwindcss";
+
+@theme {
+  /* Typography */
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  /* Every color token below is bound to a CSS variable defined per-theme in
+     the :root blocks. Nothing here is a literal, so switching themes is a
+     matter of redefining the raw values once — components never branch. */
+
+  /* Accent (single, sparing) */
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-border: var(--accent-border);
+  /* Readable foreground on top of a solid accent fill. */
+  --color-on-accent: var(--on-accent);
+
+  /* Status */
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+
+  /* Roadmap priority scale (CORE / ALTA / MÉDIA / BAIXA) */
+  --color-prio-core: var(--accent);
+  --color-prio-alta: var(--warn);
+  --color-prio-media: var(--text-muted);
+  --color-prio-baixa: var(--text-faint);
+
+  /* Graph algorithm state colors */
+  --color-state-frontier: var(--state-frontier);
+  --color-state-current: var(--accent);
+  --color-state-expanded: var(--state-expanded);
+  --color-state-solution: var(--success);
+  --color-state-discarded: var(--state-discarded);
+  --color-state-danger: var(--state-danger);
+
+  /* Semantic surfaces */
+  --color-surface: var(--bg);
+  --color-surface-raised: var(--bg-raised);
+  --color-surface-sunken: var(--bg-sunken);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --color-ink: var(--text);
+  --color-ink-muted: var(--text-muted);
+  --color-ink-faint: var(--text-faint);
+}
+
+/* ── Dark is the product's theme. Light values are kept below for a future
+   toggle, but the app pins data-theme="dark" on <html>. ── */
+:root,
+:root[data-theme="dark"] {
+  --bg: #0d0f0e;
+  --bg-raised: #151917;
+  --bg-sunken: #090a0a;
+  --border: #232826;
+  --border-strong: #323833;
+  --text: #e8e9e8;
+  --text-muted: #9aa09c;
+  --text-faint: #6a716c;
+
+  --accent: #f0883e;
+  --accent-strong: #ffa657;
+  --accent-soft: rgba(240, 136, 62, 0.12);
+  --accent-border: rgba(240, 136, 62, 0.35);
+  --on-accent: #0d0f0e;
+
+  --success: #3fb950;
+  --success-soft: rgba(63, 185, 80, 0.12);
+  --warn: #d29922;
+  --warn-soft: rgba(210, 153, 34, 0.12);
+
+  --state-frontier: #4493f8;
+  --state-expanded: #8b949e;
+  --state-discarded: #5a615c;
+  --state-danger: #f85149;
+
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --bg: #fafaf9;
+  --bg-raised: #ffffff;
+  --bg-sunken: #f2f1ee;
+  --border: #e2e0db;
+  --border-strong: #cbc8c0;
+  --text: #1c1917;
+  --text-muted: #57534e;
+  --text-faint: #928f88;
+
+  --accent: #b45309;
+  --accent-strong: #92400e;
+  --accent-soft: #fef3c7;
+  --accent-border: rgba(180, 83, 9, 0.35);
+  --on-accent: #ffffff;
+
+  --success: #15803d;
+  --success-soft: #dcfce7;
+  --warn: #a16207;
+  --warn-soft: #fef9c3;
+
+  --state-frontier: #2563eb;
+  --state-expanded: #57534e;
+  --state-discarded: #a8a29e;
+  --state-danger: #b91c1c;
+
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.font-mono-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Thin, unobtrusive scrollbars — the dark UI has a lot of scrollable rails. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 4px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ge-node-circle {
+  transition:
+    fill 320ms ease,
+    stroke 320ms ease,
+    stroke-width 320ms ease,
+    opacity 320ms ease;
+}
+
+.ge-node-group {
+  cursor: default;
+}
+.ge-node-group[data-clickable="true"] {
+  cursor: pointer;
+}
