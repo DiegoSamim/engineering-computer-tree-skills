@@ -20,7 +20,7 @@ type Resolved =
   | { type: 'iniciou'; node: NodeRow }
   | { type: 'criterio_marcado' | 'criterio_desmarcado'; node: NodeRow; criterionId: number }
   | { type: 'guia_lida' | 'guia_desmarcada'; node: NodeRow; guide: string }
-  | { type: 'exercicio_tentado' | 'exercicio_resolvido'; node: NodeRow; exerciseId: number }
+  | { type: 'exercicio_tentado' | 'exercicio_resolvido' | 'exercicio_desmarcado'; node: NodeRow; exerciseId: number }
   | { type: 'sessao_estudo'; node: NodeRow; seconds: number };
 
 /**
@@ -162,7 +162,8 @@ export class ProgressStore {
         if (!isGuideId(input.guide)) throw new HttpError(400, `Guia desconhecida: ${input.guide}`);
         return { type: input.type, node, guide: input.guide };
       case 'exercicio_tentado':
-      case 'exercicio_resolvido': {
+      case 'exercicio_resolvido':
+      case 'exercicio_desmarcado': {
         const row = this.db
           .prepare('SELECT id FROM exercise WHERE node_id = ? AND slug = ?')
           .get(node.id, input.exercise) as { id: number } | undefined;
@@ -191,11 +192,14 @@ export class ProgressStore {
         return r.type === 'guia_lida' ? !read : read;
       }
       case 'exercicio_resolvido':
-        return !exists(
+      case 'exercicio_desmarcado': {
+        const solved = exists(
           'SELECT 1 FROM user_exercise WHERE user_id = ? AND exercise_id = ? AND solved_at IS NOT NULL',
           USER,
           r.exerciseId,
         );
+        return r.type === 'exercicio_resolvido' ? !solved : solved;
+      }
       case 'exercicio_tentado':
       case 'sessao_estudo':
         return true;
@@ -232,6 +236,9 @@ export class ProgressStore {
            ON CONFLICT(user_id, exercise_id) DO UPDATE SET attempts = attempts + 1,
              solved_at = COALESCE(user_exercise.solved_at, excluded.solved_at)`,
         ).run(USER, r.exerciseId, r.type === 'exercicio_resolvido' ? at : null);
+        break;
+      case 'exercicio_desmarcado':
+        db.prepare('UPDATE user_exercise SET solved_at = NULL WHERE user_id = ? AND exercise_id = ?').run(USER, r.exerciseId);
         break;
       case 'sessao_estudo':
         db.prepare('UPDATE user_node SET seconds_studied = seconds_studied + ? WHERE user_id = ? AND node_id = ?').run(

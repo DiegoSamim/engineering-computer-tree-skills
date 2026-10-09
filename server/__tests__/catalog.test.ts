@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import type { Catalog } from '../../src/domain/tree/types.ts';
 import { validateCatalog } from '../../src/domain/tree/validate.ts';
@@ -5,6 +7,7 @@ import { exemploCatalog, exemploComCiclo } from '../../src/domain/tree/__fixture
 import { readCatalog } from '../catalog/read.ts';
 import { seedCatalog, SlugRemovidoError } from '../catalog/seed.ts';
 import { validateCatalogSql } from '../catalog/validateSql.ts';
+import { openDatabase } from '../db.ts';
 import { migrate } from '../migrations/run.ts';
 import { ProgressStore } from '../progress/store.ts';
 import { freshDb, nodeId } from './helpers.ts';
@@ -31,8 +34,28 @@ function normalized(catalog: Catalog): Catalog {
 describe('migrate', () => {
   it('é idempotente e cria o usuário local', () => {
     const db = freshDb();
-    expect(migrate(db)).toEqual({ applied: [], current: 1 });
+    expect(migrate(db)).toEqual({ applied: [], current: 2 });
     expect(db.prepare('SELECT id, handle FROM app_user').all()).toEqual([{ id: 1, handle: 'local' }]);
+  });
+
+  it('002 aceita exercicio_desmarcado sem perder os eventos de um banco v1', () => {
+    const db = openDatabase(':memory:');
+    db.exec(readFileSync(join(import.meta.dirname, '../migrations/001_skill_tree.sql'), 'utf8'));
+    db.exec('CREATE TABLE schema_migrations (version INTEGER PRIMARY KEY, applied_at TEXT NOT NULL)');
+    db.exec("INSERT INTO schema_migrations VALUES (1, '2026-10-09')");
+    seedCatalog(db, exemploCatalog());
+    new ProgressStore(db).append({ type: 'criterio_marcado', node: 'two-pointers', criterion: 'variacoes' }, '2026-10-09T10:00:00.000Z');
+    expect(() =>
+      db.exec("INSERT INTO progress_event (user_id, node_id, type) VALUES (1, 1, 'exercicio_desmarcado')"),
+    ).toThrow(/CHECK/);
+
+    expect(migrate(db)).toEqual({ applied: [2], current: 2 });
+    expect(new ProgressStore(db).exportLog().events).toEqual([
+      { type: 'criterio_marcado', node: 'two-pointers', criterion: 'variacoes', occurredAt: '2026-10-09T10:00:00.000Z' },
+    ]);
+    expect(db.prepare("SELECT xp FROM v_area_xp WHERE slug = 'fund'").get()).toEqual({ xp: 10 });
+    new ProgressStore(db).append({ type: 'exercicio_resolvido', node: 'two-pointers', exercise: 'two-sum-ii' });
+    expect(new ProgressStore(db).append({ type: 'exercicio_desmarcado', node: 'two-pointers', exercise: 'two-sum-ii' })).toBe(true);
   });
 });
 

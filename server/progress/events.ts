@@ -41,7 +41,8 @@ export function validateEvent(input: unknown): Validated<ProgressEventInput> {
     }
 
     case 'exercicio_tentado':
-    case 'exercicio_resolvido': {
+    case 'exercicio_resolvido':
+    case 'exercicio_desmarcado': {
       const exercise = str(obj, 'exercise');
       if (!exercise) return { ok: false, error: `${type} exige "exercise"` };
       return { ok: true, value: { type, node, exercise } };

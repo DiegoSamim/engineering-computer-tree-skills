@@ -71,6 +71,12 @@ describe('ProgressStore', () => {
     expect(store.append({ type: 'exercicio_resolvido', node: 'two-pointers', exercise: 'two-sum-ii' }, T(5))).toBe(false);
     expect(tp().exercises).toEqual({ 'two-sum-ii': { attempts: 2, solvedAt: T(4) } });
 
+    store.append({ type: 'exercicio_desmarcado', node: 'two-pointers', exercise: 'two-sum-ii' }, T(6));
+    expect(store.append({ type: 'exercicio_desmarcado', node: 'two-pointers', exercise: 'two-sum-ii' }, T(7))).toBe(false);
+    expect(tp().exercises).toEqual({ 'two-sum-ii': { attempts: 2, solvedAt: null } });
+    store.append({ type: 'exercicio_resolvido', node: 'two-pointers', exercise: 'two-sum-ii' }, T(8));
+    expect(tp().exercises['two-sum-ii'].solvedAt).toBe(T(8));
+
     store.append({ type: 'sessao_estudo', node: 'two-pointers', seconds: 300 });
     store.append({ type: 'sessao_estudo', node: 'two-pointers', seconds: 120 });
     expect(tp().secondsStudied).toBe(420);

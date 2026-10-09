@@ -159,6 +159,7 @@ export const EVENT_TYPES = [
   'guia_desmarcada',
   'exercicio_tentado',
   'exercicio_resolvido',
+  'exercicio_desmarcado',
   'sessao_estudo',
 ] as const;
 export type EventType = (typeof EVENT_TYPES)[number];
@@ -168,5 +169,5 @@ export type ProgressEventInput =
   | { type: 'iniciou'; node: string }
   | { type: 'criterio_marcado' | 'criterio_desmarcado'; node: string; criterion: string }
   | { type: 'guia_lida' | 'guia_desmarcada'; node: string; guide: string }
-  | { type: 'exercicio_tentado' | 'exercicio_resolvido'; node: string; exercise: string }
+  | { type: 'exercicio_tentado' | 'exercicio_resolvido' | 'exercicio_desmarcado'; node: string; exercise: string }
   | { type: 'sessao_estudo'; node: string; seconds: number };
