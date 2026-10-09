@@ -8,7 +8,9 @@ est_minutes: 45
 summary: Dois índices que se movem de forma coordenada, eliminando possibilidades a cada passo.
 place: { role: tronco, x: 0.5, y: 0.7 }
 requires:
-  # Ordenação ainda não tem conteúdo; como obrigatório, travaria Two Pointers.
+  # Laços (Lógica de programação) é a base obrigatória. Ordenação ainda não
+  # tem conteúdo; como obrigatória, travaria Two Pointers.
+  - { node: lacos }
   - { node: ordenacao, strength: recomendado }
 related:
   - { node: sliding-window, type: compara_com }

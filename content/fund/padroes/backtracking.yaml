@@ -5,3 +5,5 @@ kind: padrao
 content: planejado
 summary: Modelar estado, escolhas, restrições e desfazer — a árvore de decisões com poda.
 place: { role: tronco, x: 0.56, y: 0.24 }
+requires:
+  - { node: recursao, min_level: 2 }
