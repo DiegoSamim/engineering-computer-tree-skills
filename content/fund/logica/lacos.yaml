@@ -6,7 +6,7 @@ content: planejado
 max_level: 3
 est_minutes: 60
 summary: "Repetir até uma condição: for e while, contadores, acumuladores e condição de parada."
-place: { role: tronco, x: 0.44, y: 0.32 }
+place: { role: tronco, x: 0.36, y: 0.34 }
 requires:
   - { node: condicionais }
 levels:

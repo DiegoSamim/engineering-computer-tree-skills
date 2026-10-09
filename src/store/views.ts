@@ -280,24 +280,135 @@ export interface CameraShot {
 }
 
 /** Aproximar para ver a estrela selecionada; mergulhar ao abrir a habilidade. */
-export const CAMERA_FOCUS: CameraShot = { zoom: 1.75, tilt: 16 };
-export const CAMERA_DIVE: CameraShot = { zoom: 6, tilt: 24 };
+export const CAMERA_FOCUS: CameraShot = { zoom: 1.75, tilt: 12 };
+export const CAMERA_DIVE: CameraShot = { zoom: 6, tilt: 20 };
+
+export type ViewBox = [x: number, y: number, width: number, height: number];
 
 /**
- * Transformação CSS que leva a estrela (em coordenadas do viewBox) até o
- * ponto `target` da cena, aproximando e inclinando em volta dela. A cena é um
- * SVG de `box` px com preserveAspectRatio "meet" (centralizado). A lista de
- * funções é sempre a mesma, para o navegador interpolar de uma estrela a outra.
+ * viewBox do SVG para a câmera. O zoom é feito no próprio SVG (e não com
+ * scale em CSS) para os vetores serem redesenhados nítidos em qualquer zoom.
+ *
+ * O viewBox tem a proporção da cena (`box`, em px), então a conversão é
+ * exata: sem estrela, a constelação inteira cabe centralizada (como o "meet");
+ * com estrela, ela fica no ponto `target` da cena, aproximada `zoom` vezes.
  */
-export function cameraTransform(
-  star: { cx: number; cy: number },
+export function cameraViewBox(
+  star: { cx: number; cy: number } | null,
   box: { width: number; height: number },
   target: { x: number; y: number },
-  shot: CameraShot,
-): string {
-  const k = Math.min(box.width / SKY_W, box.height / SKY_H);
-  const x = (box.width - SKY_W * k) / 2 + star.cx * k;
-  const y = (box.height - SKY_H * k) / 2 + star.cy * k;
+  zoom: number,
+): ViewBox {
+  const fit = Math.min(box.width / SKY_W, box.height / SKY_H);
   const r = (n: number) => Math.round(n * 100) / 100;
-  return `translate3d(${r(target.x)}px, ${r(target.y)}px, 0) rotateX(${shot.tilt}deg) scale(${shot.zoom}) translate3d(${r(-x)}px, ${r(-y)}px, 0)`;
+  if (!star || fit <= 0) {
+    const w = box.width / fit;
+    const h = box.height / fit;
+    return fit > 0 ? [r((SKY_W - w) / 2), r((SKY_H - h) / 2), r(w), r(h)] : [0, 0, SKY_W, SKY_H];
+  }
+  const scale = fit * zoom;
+  return [r(star.cx - target.x / scale), r(star.cy - target.y / scale), r(box.width / scale), r(box.height / scale)];
+}
+
+// ── Rótulos das estrelas ──────────────────────────────────────────────────
+
+/** Tamanho do rótulo na constelação expandida, em unidades do viewBox. */
+export const LABEL_FONT = 12.5;
+
+export interface LabelPlacement {
+  x: number;
+  /** Linha de base do nome; o rótulo de espelho vai logo abaixo. */
+  y: number;
+  anchor: 'middle' | 'start' | 'end';
+}
+
+type Rect = { x0: number; y0: number; x1: number; y1: number };
+type Side = 'below' | 'right' | 'left' | 'above';
+
+/** Preferência: embaixo (o padrão do protótipo), depois dos lados, por último em cima. */
+const SIDE_COST: Record<Side, number> = { below: 0, right: 0.6, left: 0.6, above: 0.9 };
+
+function overlaps(a: Rect, b: Rect): boolean {
+  return a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
+}
+
+/** O segmento cruza o retângulo? (Liang–Barsky.) */
+function segmentHitsRect(x1: number, y1: number, x2: number, y2: number, r: Rect): boolean {
+  let t0 = 0;
+  let t1 = 1;
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const clip = (p: number, q: number) => {
+    if (p === 0) return q >= 0;
+    const t = q / p;
+    if (p < 0) {
+      if (t > t1) return false;
+      if (t > t0) t0 = t;
+    } else {
+      if (t < t0) return false;
+      if (t < t1) t1 = t;
+    }
+    return true;
+  };
+  return clip(-dx, x1 - r.x0) && clip(dx, r.x1 - x1) && clip(-dy, y1 - r.y0) && clip(dy, r.y1 - y1);
+}
+
+/**
+ * Onde desenhar o nome de cada estrela para não ficar por cima de linhas,
+ * de outras estrelas nem de outros nomes. Testa embaixo, à direita, à
+ * esquerda e em cima, e fica com o lado de menor custo. A largura do texto é
+ * estimada (sem medir no DOM), o que basta para evitar as colisões visíveis.
+ */
+export function placeLabels(stars: StarView[], edges: EdgeView[], font = LABEL_FONT): Record<string, LabelPlacement> {
+  const lineH = font * 1.25;
+  const starRects: Rect[] = stars.map((s) => ({ x0: s.cx - s.r - 3, y0: s.cy - s.r - 3, x1: s.cx + s.r + 3, y1: s.cy + s.r + 3 }));
+  const placed: Rect[] = [];
+  const out: Record<string, LabelPlacement> = {};
+
+  stars.forEach((star, i) => {
+    const width = star.title.length * font * 0.55;
+    const height = star.mirror ? lineH * 2 : lineH;
+    const gap = 8;
+    const candidates: { side: Side; place: LabelPlacement; rect: Rect }[] = [
+      {
+        side: 'below',
+        place: { x: star.cx, y: star.cy + star.r + gap + font, anchor: 'middle' },
+        rect: { x0: star.cx - width / 2, y0: star.cy + star.r + gap, x1: star.cx + width / 2, y1: star.cy + star.r + gap + height },
+      },
+      {
+        side: 'right',
+        place: { x: star.cx + star.r + gap, y: star.cy + font * 0.35, anchor: 'start' },
+        rect: { x0: star.cx + star.r + gap, y0: star.cy - lineH / 2, x1: star.cx + star.r + gap + width, y1: star.cy - lineH / 2 + height },
+      },
+      {
+        side: 'left',
+        place: { x: star.cx - star.r - gap, y: star.cy + font * 0.35, anchor: 'end' },
+        rect: { x0: star.cx - star.r - gap - width, y0: star.cy - lineH / 2, x1: star.cx - star.r - gap, y1: star.cy - lineH / 2 + height },
+      },
+      {
+        side: 'above',
+        place: { x: star.cx, y: star.cy - star.r - gap - (height - lineH) - font * 0.3, anchor: 'middle' },
+        rect: { x0: star.cx - width / 2, y0: star.cy - star.r - gap - height, x1: star.cx + width / 2, y1: star.cy - star.r - gap },
+      },
+    ];
+
+    let best = candidates[0];
+    let bestCost = Infinity;
+    for (const c of candidates) {
+      let cost = SIDE_COST[c.side];
+      for (const e of edges) if (segmentHitsRect(e.x1, e.y1, e.x2, e.y2, c.rect)) cost += 2;
+      starRects.forEach((r, j) => {
+        if (j !== i && overlaps(c.rect, r)) cost += 3;
+      });
+      for (const r of placed) if (overlaps(c.rect, r)) cost += 4;
+      if (c.rect.x0 < 0 || c.rect.x1 > SKY_W || c.rect.y0 < 0 || c.rect.y1 > SKY_H) cost += 1.5;
+      if (cost < bestCost) {
+        best = c;
+        bestCost = cost;
+      }
+    }
+    placed.push(best.rect);
+    out[star.slug] = best.place;
+  });
+  return out;
 }

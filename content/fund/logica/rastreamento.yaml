@@ -6,7 +6,7 @@ content: planejado
 max_level: 3
 est_minutes: 30
 summary: "Prever o que o código faz sem executar, simulando à mão o valor de cada variável."
-place: { role: lateral, x: 0.18, y: 0.3 }
+place: { role: lateral, x: 0.08, y: 0.3 }
 requires:
   - { node: lacos }
 levels:

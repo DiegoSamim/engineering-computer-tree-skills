@@ -6,7 +6,7 @@ content: planejado
 max_level: 3
 est_minutes: 60
 summary: "Dividir o programa em partes reutilizáveis, com parâmetros, retorno e escopo."
-place: { role: tronco, x: 0.56, y: 0.2 }
+place: { role: tronco, x: 0.64, y: 0.22 }
 requires:
   - { node: lacos }
 levels:

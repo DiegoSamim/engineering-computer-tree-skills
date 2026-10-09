@@ -6,7 +6,7 @@ content: planejado
 max_level: 3
 est_minutes: 60
 summary: "Uma função resolve um problema chamando a si mesma: caso base, pilha de chamadas e árvore de chamadas."
-place: { role: tronco, x: 0.46, y: 0.07 }
+place: { role: tronco, x: 0.42, y: 0.06 }
 mirrors:
   - { branch: fund/padroes, role: lateral, x: 0.82, y: 0.26 }
 requires:

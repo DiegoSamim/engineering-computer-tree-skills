@@ -6,7 +6,7 @@ content: planejado
 max_level: 3
 est_minutes: 45
 summary: "Combinar condições com E, OU e NÃO sem errar, e simplificá-las."
-place: { role: tronco, x: 0.42, y: 0.56 }
+place: { role: tronco, x: 0.36, y: 0.58 }
 requires:
   - { node: operadores }
 levels:

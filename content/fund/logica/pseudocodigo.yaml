@@ -6,7 +6,7 @@ content: planejado
 max_level: 3
 est_minutes: 30
 summary: "Descrever um algoritmo sem depender de linguagem, em texto estruturado ou em diagrama."
-place: { role: lateral, x: 0.8, y: 0.88 }
+place: { role: lateral, x: 0.86, y: 0.9 }
 requires:
   - { node: algoritmos }
 levels:

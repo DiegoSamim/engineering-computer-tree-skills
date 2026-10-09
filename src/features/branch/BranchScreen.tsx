@@ -2,7 +2,8 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperti
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { NotFound, PageTop } from '../../app/AppShell';
 import { useEscape } from '../../app/useEscape';
-import { CAMERA_DIVE, CAMERA_FOCUS, cameraTransform, constellationView, nodeView, type NodeView } from '../../store/views';
+import { CAMERA_DIVE, CAMERA_FOCUS, cameraViewBox, constellationView, nodeView, type NodeView } from '../../store/views';
+import { EASE_IN, EASE_SKY } from '../../ui/easing';
 import { useReady } from '../../store/useTree';
 import { Constellation } from '../../ui/Constellation';
 import { Legend } from '../../ui/Legend';
@@ -59,6 +60,25 @@ function BranchSky({ area: areaSlug, branch: branchSlug }: { area: string; branc
     sky.current?.querySelector<SVGGElement>(`[data-slug="${selected}"]`)?.focus({ preventScroll: true });
   }, [selected]);
 
+  // Inclinação em perspectiva durante o movimento da câmera (estilo Skyrim).
+  // Ela é um movimento, não um estado: parada, a cena fica plana e o SVG é
+  // desenhado nítido no zoom final. Uma camada 3D parada borraria o texto.
+  const scene = useRef<HTMLDivElement>(null);
+  const focusKey = selected ?? '';
+  const firstFocus = useRef(true);
+  useEffect(() => {
+    if (firstFocus.current) {
+      firstFocus.current = false;
+      if (!focusKey) return;
+    }
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const tilt = `rotateX(${CAMERA_FOCUS.tilt}deg)`;
+    scene.current?.animate([{ transform: 'none' }, { transform: tilt, offset: 0.4 }, { transform: 'none' }], {
+      duration: 900,
+      easing: 'cubic-bezier(0.22, 0.9, 0.24, 1)',
+    });
+  }, [focusKey]);
+
   const dive = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useEffect(() => () => clearTimeout(dive.current), []);
 
@@ -78,6 +98,11 @@ function BranchSky({ area: areaSlug, branch: branchSlug }: { area: string; branc
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return go();
     setSelected(slug);
     setDiving(slug);
+    scene.current?.animate([{ transform: 'none', opacity: 1 }, { transform: `rotateX(${CAMERA_DIVE.tilt}deg)`, opacity: 0 }], {
+      duration: DIVE_MS,
+      easing: 'cubic-bezier(0.5, 0, 0.75, 0)',
+      fill: 'forwards',
+    });
     dive.current = setTimeout(go, DIVE_MS);
   };
   const goHome = (v: NodeView) => {
@@ -93,7 +118,13 @@ function BranchSky({ area: areaSlug, branch: branchSlug }: { area: string; branc
   const focus = diving ?? selected;
   const star = focus ? view.stars.find((s) => s.slug === focus) : undefined;
   const target = box.narrow ? { x: box.width / 2, y: box.height * 0.28 } : { x: (box.width - PANEL_W) / 2, y: box.height / 2 };
-  const transform = star && box.width > 0 ? cameraTransform(star, box, target, diving ? CAMERA_DIVE : CAMERA_FOCUS) : 'none';
+  const shot = diving ? CAMERA_DIVE : CAMERA_FOCUS;
+  const camera = {
+    viewBox: cameraViewBox(star ?? null, box, target, shot.zoom),
+    duration: diving ? DIVE_MS : 900,
+    ease: diving ? EASE_IN : EASE_SKY,
+  };
+
 
   return (
     <>
@@ -118,8 +149,16 @@ function BranchSky({ area: areaSlug, branch: branchSlug }: { area: string; branc
             style={{ perspectiveOrigin: `${target.x}px ${target.y}px` } as CSSProperties}
           >
             {view.stars.length > 0 ? (
-              <div className={`scene ${diving ? 'diving' : ''}`} style={{ transform }}>
-                <Constellation view={view} label={branch.name} big selected={selected} onSelect={setSelected} onOpen={open} />
+              <div ref={scene} className="scene" style={{ '--ox': `${target.x}px`, '--oy': `${target.y}px` } as CSSProperties}>
+                <Constellation
+                  view={view}
+                  label={branch.name}
+                  big
+                  selected={selected}
+                  onSelect={setSelected}
+                  onOpen={open}
+                  camera={camera}
+                />
               </div>
             ) : (
               <p className="empty-sky">

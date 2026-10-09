@@ -6,7 +6,7 @@ import { deriveStates } from '../../domain/tree/state';
 import type { ProgressMap } from '../../domain/tree/types';
 import { exemploCatalog } from '../../domain/tree/__fixtures__/exemplo';
 import {
-  cameraTransform,
+  cameraViewBox,
   cardPosition,
   carouselLayout,
   circularOffset,
@@ -14,6 +14,7 @@ import {
   firstBranchWithNodes,
   levelChangeMessage,
   nodeView,
+  placeLabels,
   px,
   py,
   requireLine,
@@ -151,18 +152,37 @@ describe('carrossel', () => {
   });
 });
 
-describe('cameraTransform', () => {
-  it('leva a estrela ao alvo, em volta dela', () => {
-    // Cena do tamanho do viewBox: a estrela fica onde está no viewBox.
-    expect(cameraTransform({ cx: 300, cy: 260 }, { width: 600, height: 520 }, { x: 300, y: 260 }, { zoom: 2, tilt: 10 })).toBe(
-      'translate3d(300px, 260px, 0) rotateX(10deg) scale(2) translate3d(-300px, -260px, 0)',
-    );
+describe('cameraViewBox', () => {
+  it('sem estrela, a constelação inteira cabe centralizada', () => {
+    expect(cameraViewBox(null, { width: 600, height: 520 }, { x: 0, y: 0 }, 1)).toEqual([0, 0, 600, 520]);
+    // Cena mais larga: sobra horizontal dividida entre os dois lados.
+    expect(cameraViewBox(null, { width: 1200, height: 520 }, { x: 0, y: 0 }, 1)).toEqual([-300, 0, 1200, 520]);
   });
 
-  it('respeita o encaixe "meet" do SVG (sobra horizontal centralizada)', () => {
-    // 1200 × 520: escala 1, 300px de sobra de cada lado.
-    expect(cameraTransform({ cx: 50, cy: 34 }, { width: 1200, height: 520 }, { x: 430, y: 260 }, { zoom: 1.5, tilt: 0 })).toBe(
-      'translate3d(430px, 260px, 0) rotateX(0deg) scale(1.5) translate3d(-350px, -34px, 0)',
-    );
+  it('com estrela, ela fica no alvo, aproximada', () => {
+    const [x, y, w, h] = cameraViewBox({ cx: 300, cy: 260 }, { width: 600, height: 520 }, { x: 150, y: 260 }, 2);
+    expect([w, h]).toEqual([300, 260]);
+    // A estrela cai exatamente no alvo: (cx - x) * escala = alvo.
+    expect([(300 - x) * (600 / w), (260 - y) * (520 / h)]).toEqual([150, 260]);
+  });
+});
+
+describe('placeLabels', () => {
+  const star = (slug: string, cx: number, cy: number, title = 'Nome') =>
+    ({ slug, title, cx, cy, r: 12, role: 'tronco', state: 'disponivel', level: 0, maxLevel: 3, planned: false, mirror: false, homeColor: '', homeBranchName: '' }) as const;
+  const edge = (x1: number, y1: number, x2: number, y2: number) => ({ key: `${x1}`, from: 'a', to: 'b', x1, y1, x2, y2, lit: false, alt: false });
+
+  it('põe o nome embaixo quando está livre', () => {
+    expect(placeLabels([star('a', 300, 200)], [])).toEqual({ a: { x: 300, y: 232.5, anchor: 'middle' } });
+  });
+
+  it('desvia de uma linha que passa logo abaixo', () => {
+    const labels = placeLabels([star('a', 300, 200, 'Laços de repetição')], [edge(200, 235, 400, 235)]);
+    expect(labels.a.anchor).not.toBe('middle');
+  });
+
+  it('não sobrepõe dois nomes vizinhos', () => {
+    const labels = placeLabels([star('a', 300, 200, 'Variáveis e tipos'), star('b', 310, 230, 'Operadores e expressões')], []);
+    expect(labels.a.anchor === 'middle' && labels.b.anchor === 'middle').toBe(false);
   });
 });

@@ -6,7 +6,7 @@ content: planejado
 max_level: 3
 est_minutes: 45
 summary: "Como o programa escolhe um caminho: if, else, encadeamentos e casos de borda."
-place: { role: tronco, x: 0.56, y: 0.44 }
+place: { role: tronco, x: 0.64, y: 0.46 }
 requires:
   - { node: logica-booleana }
 levels:

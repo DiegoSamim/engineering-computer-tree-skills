@@ -6,7 +6,7 @@ content: planejado
 max_level: 3
 est_minutes: 40
 summary: "Como o programa guarda e nomeia valores: atribuição, tipos primitivos e conversões."
-place: { role: tronco, x: 0.4, y: 0.8 }
+place: { role: tronco, x: 0.34, y: 0.82 }
 requires:
   - { node: algoritmos }
 levels:

@@ -6,7 +6,7 @@ content: planejado
 max_level: 3
 est_minutes: 40
 summary: "Transformar um problema em passos claros que o computador executa: entrada, processamento e saída."
-place: { role: tronco, x: 0.5, y: 0.92 }
+place: { role: tronco, x: 0.5, y: 0.94 }
 levels:
   - level: 1
     name: Entendi

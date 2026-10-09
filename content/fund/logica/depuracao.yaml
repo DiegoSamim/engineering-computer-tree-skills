@@ -6,7 +6,7 @@ content: planejado
 max_level: 3
 est_minutes: 45
 summary: "Encontrar a causa de um erro: ler a mensagem, isolar o problema e provar a correção."
-place: { role: lateral, x: 0.16, y: 0.19 }
+place: { role: lateral, x: 0.12, y: 0.12 }
 requires:
   - { node: rastreamento }
   - { node: funcoes }

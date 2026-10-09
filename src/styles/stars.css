@@ -114,8 +114,7 @@
   .star .lbl {
     fill: var(--color-ink-muted);
     font-family: var(--font-body);
-    font-size: 13.5px;
-    text-anchor: middle;
+    font-size: 12.5px;
     paint-order: stroke;
     stroke: var(--color-bg);
     stroke-width: 5px;
@@ -127,8 +126,7 @@
   }
   .star .tag {
     fill: var(--home);
-    font-size: 10.5px;
-    text-anchor: middle;
+    font-size: 10px;
     letter-spacing: 0.04em;
     paint-order: stroke;
     stroke: var(--color-bg);

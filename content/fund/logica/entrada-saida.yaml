@@ -6,7 +6,7 @@ content: planejado
 max_level: 3
 est_minutes: 30
 summary: "Ler dados de quem usa o programa e mostrar resultados no formato pedido."
-place: { role: lateral, x: 0.16, y: 0.74 }
+place: { role: lateral, x: 0.08, y: 0.74 }
 requires:
   - { node: variaveis-tipos }
 levels:

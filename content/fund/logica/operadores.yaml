@@ -6,7 +6,7 @@ content: planejado
 max_level: 3
 est_minutes: 40
 summary: "Calcular e comparar valores com operadores aritméticos, relacionais e de módulo."
-place: { role: tronco, x: 0.54, y: 0.68 }
+place: { role: tronco, x: 0.64, y: 0.7 }
 requires:
   - { node: variaveis-tipos }
 levels:

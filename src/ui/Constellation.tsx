@@ -1,5 +1,16 @@
-import type { CSSProperties, KeyboardEvent } from 'react';
-import { SKY_H, SKY_W, px, py, type ConstellationView, type StarView } from '../store/views';
+import { useLayoutEffect, useMemo, useRef, type CSSProperties, type KeyboardEvent, type RefObject } from 'react';
+import {
+  LABEL_FONT,
+  SKY_H,
+  SKY_W,
+  placeLabels,
+  px,
+  py,
+  type ConstellationView,
+  type LabelPlacement,
+  type StarView,
+  type ViewBox,
+} from '../store/views';
 import { STATE_LABEL } from './labels';
 
 interface Props {
@@ -11,6 +22,11 @@ interface Props {
   selected?: string | null;
   onSelect?: (slug: string) => void;
   onOpen?: (slug: string) => void;
+  /**
+   * Câmera: o viewBox para onde animar. O zoom acontece no próprio SVG, que
+   * é redesenhado a cada quadro (nítido em qualquer aproximação).
+   */
+  camera?: { viewBox: ViewBox; duration: number; ease: (t: number) => number };
 }
 
 const cssVars = (vars: Record<string, string | number>) => vars as CSSProperties;
@@ -20,7 +36,11 @@ const cssVars = (vars: Record<string, string | number>) => vars as CSSProperties
  * são requisitos (acesa = cumprido, tracejada = alternativa OU). As estrelas
  * são StarNodes; a forma diz o estado sem precisar de texto.
  */
-export function Constellation({ view, label, big = false, selected = null, onSelect, onOpen }: Props) {
+export function Constellation({ view, label, big = false, selected = null, onSelect, onOpen, camera }: Props) {
+  const svg = useRef<SVGSVGElement>(null);
+  useCamera(svg, camera);
+  const labels = useMemo(() => (big ? placeLabels(view.stars, view.edges) : {}), [big, view]);
+
   if (view.stars.length === 0) {
     return (
       <svg className="constellation" viewBox={`0 0 ${SKY_W} ${SKY_H}`} role="img" aria-label={`${label}: nenhuma habilidade ainda`}>
@@ -35,8 +55,10 @@ export function Constellation({ view, label, big = false, selected = null, onSel
 
   return (
     <svg
+      ref={svg}
       className={`constellation ${big ? 'big' : ''} ${big && selected ? 'focus' : ''}`}
-      viewBox={`0 0 ${SKY_W} ${SKY_H}`}
+      viewBox={camera ? undefined : `0 0 ${SKY_W} ${SKY_H}`}
+      preserveAspectRatio="xMidYMid meet"
       role={big ? 'group' : 'img'}
       aria-label={`Constelação ${label}`}
     >
@@ -62,6 +84,7 @@ export function Constellation({ view, label, big = false, selected = null, onSel
           index={i}
           big={big}
           selected={selected === star.slug}
+          label={labels[star.slug]}
           onSelect={onSelect}
           onOpen={onOpen}
         />
@@ -70,9 +93,52 @@ export function Constellation({ view, label, big = false, selected = null, onSel
   );
 }
 
+/**
+ * Anima o viewBox do SVG até o da câmera. Fica fora do React (atributo
+ * direto, a cada quadro) para não re-renderizar a constelação 60 vezes por
+ * segundo. Com movimento reduzido, vai direto ao destino.
+ */
+function useCamera(svg: RefObject<SVGSVGElement | null>, camera: Props['camera']) {
+  const current = useRef<ViewBox | null>(null);
+  const latest = useRef(camera);
+  const target = camera?.viewBox.join(' ');
+
+  // Duração e curva vêm junto com o destino; o efeito abaixo reage só a ele.
+  useLayoutEffect(() => {
+    latest.current = camera;
+  });
+
+  useLayoutEffect(() => {
+    const el = svg.current;
+    const camera = latest.current;
+    if (!el || !camera) return;
+    const to = camera.viewBox;
+    const from = current.current;
+    const set = (vb: ViewBox) => {
+      current.current = vb;
+      el.setAttribute('viewBox', vb.join(' '));
+    };
+    if (!from || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      set(to);
+      return;
+    }
+    const start = performance.now();
+    let frame = 0;
+    const step = (now: number) => {
+      const t = camera.ease(Math.min(1, (now - start) / camera.duration));
+      set(from.map((v, i) => v + (to[i] - v) * t) as ViewBox);
+      if (t < 1) frame = requestAnimationFrame(step);
+    };
+    frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
+  }, [svg, target]);
+}
+
 interface StarProps {
   star: StarView;
   index: number;
+  /** Onde vai o nome (só na constelação expandida). */
+  label?: LabelPlacement;
   big: boolean;
   selected: boolean;
   onSelect?: (slug: string) => void;
@@ -80,7 +146,7 @@ interface StarProps {
 }
 
 /** A estrela de um nó. Sem conteúdo e espelho são camadas sobre qualquer estado. */
-function StarNode({ star, index, big, selected, onSelect, onOpen }: StarProps) {
+function StarNode({ star, index, big, selected, label, onSelect, onOpen }: StarProps) {
   const { cx, cy, r, state } = star;
   const circumference = 2 * Math.PI * (r + 4.5);
 
@@ -139,11 +205,16 @@ function StarNode({ star, index, big, selected, onSelect, onOpen }: StarProps) {
       {big && (
         <>
           <circle className="selring" cx={cx} cy={cy} r={r + 15} />
-          <text className="lbl" x={cx} y={cy + r + 24}>
+          <text className="lbl" x={label?.x ?? cx} y={label?.y ?? cy + r + 24} textAnchor={label?.anchor ?? 'middle'}>
             {star.title}
           </text>
           {star.mirror && (
-            <text className="tag" x={cx} y={cy + r + 38}>
+            <text
+              className="tag"
+              x={label?.x ?? cx}
+              y={(label?.y ?? cy + r + 24) + LABEL_FONT * 1.2}
+              textAnchor={label?.anchor ?? 'middle'}
+            >
               ↗ {star.homeBranchName}
             </text>
           )}
