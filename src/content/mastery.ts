@@ -1,7 +1,15 @@
-import { MASTERY_DIMENSIONS, type MasteryDimension } from '../data/types';
+export const MASTERY_DIMENSIONS = [
+  'reconhecimento',
+  'modelagem',
+  'implementacao',
+  'correcao',
+  'complexidade',
+  'validacao',
+  'retencao',
+  'performance',
+] as const;
 
-export { MASTERY_DIMENSIONS };
-export type { MasteryDimension };
+export type MasteryDimension = (typeof MASTERY_DIMENSIONS)[number];
 
 /**
  * The 8 observable mastery dimensions from §08 of the roadmap. They are the

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
-import type { TopicContent } from '../../content/topics/types';
-import { MENTAL_SCRIPT } from '../../content/signals';
-import { TwoPointersVisualizer } from './TwoPointersVisualizer';
+import type { TopicContent } from '../../../content/topics/types';
+import { MENTAL_SCRIPT } from '../../../content/signals';
+import { TwoPointersVisualizer } from '../../../visualizers/twoPointers/TwoPointersVisualizer';
 
 interface SectionProps {
   id: string;

@@ -1,8 +1,6 @@
 import { createServer } from 'node:http';
 import { openDatabase } from './db.ts';
 import { migrate } from './migrations/run.ts';
-import { seedCatalog } from './seed.ts';
-import { SqliteProgressStore } from './store.ts';
 import { createRoutes } from './routes.ts';
 
 const PORT = Number(process.env.PORT ?? 8787);
@@ -14,15 +12,11 @@ const db = openDatabase(DB_PATH);
 const { applied, current } = migrate(db);
 if (applied.length > 0) console.log(`[api] migrations aplicadas: ${applied.join(', ')}`);
 
-const { sections, topics } = seedCatalog(db);
-
-const store = new SqliteProgressStore(db);
-const server = createServer(createRoutes(store));
+const server = createServer(createRoutes());
 
 server.listen(PORT, HOST, () => {
   console.log(`[api] ouvindo em http://${HOST}:${PORT}`);
-  console.log(`[api] banco: ${DB_PATH} (schema v${current}) · catálogo: ${sections} seções, ${topics} tópicos`);
-  console.log(`[api] eventos registrados: ${store.eventCount()}`);
+  console.log(`[api] banco: ${DB_PATH} (schema v${current})`);
 });
 
 // Fecha o banco de forma limpa para o WAL não ficar com checkpoint pendente

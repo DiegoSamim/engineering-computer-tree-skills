@@ -1,4 +1,4 @@
-import type { MasteryDimension } from '../../data/types';
+import type { MasteryDimension } from '../mastery';
 
 /**
  * O molde de um tópico. Two Pointers é a primeira implementação completa;

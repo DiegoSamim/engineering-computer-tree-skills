@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
-import { buildTwoPointersTrace } from '../../visualizers/twoPointers/run';
-import { TwoPointersCanvas } from '../../visualizers/twoPointers/TwoPointersCanvas';
+import { buildTwoPointersTrace } from './run';
+import { TwoPointersCanvas } from './TwoPointersCanvas';
 import { usePlayer } from '../../player/usePlayer';
 import { PlayerControls } from '../../player/PlayerControls';
 import { Timeline } from '../../player/Timeline';
