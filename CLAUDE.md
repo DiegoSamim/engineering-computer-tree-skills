@@ -55,7 +55,9 @@ Em caso de conflito: este arquivo > `docs/db/schema.sql` > design system > prot�
 - O conteúdo vive no git. **Metadados** de cada nó: `content/<area>/<branch>/<no>.yaml` (os campos do formato abaixo). **Corpo** das guias: `src/content/topics/<slug>.ts` (formato `TopicContent`). Decisão de 2026-10-09: **sem MDX por enquanto**; nó `publicado` exige o arquivo TS.
 - Metadados de área e branch: `content/<area>/_area.yaml`, `content/<area>/<branch>/_branch.yaml`.
 - Um script (`scripts/build-catalog.ts`) lê o frontmatter, valida (as mesmas regras de `validate.sql`, inclusive ciclos) e gera `src/generated/catalog.json` (não versionado; os scripts npm `pre*` o regeneram). O servidor semeia o SQLite no boot a partir desse JSON, de forma idempotente por slug. O build falha se a validação falhar.
-- **Escopo inicial do conteúdo: só a área `fund` e a branch `fund/padroes`.** As outras áreas e branches de `docs/catalogo.md` entram depois.
+- **Escopo do conteúdo: `fund/logica` e `fund/padroes`.** As outras áreas e branches de `docs/catalogo.md` entram depois.
+- **Lógica de programação (`fund/logica`) é a base de Fundamentos**: primeira branch da área (position 1) e requisito obrigatório das outras. Suas 12 habilidades nascem `planejado`, porém **com critérios** nos 3 níveis, para já poderem evoluir. Padrões depende dela (Ordenação, Two Pointers e Prefix Sum exigem Laços; Backtracking e Programação dinâmica exigem Recursão nível 2; Recursão aparece em Padrões como espelho).
+- **Regra para as próximas branches**: a entrada de cada branch exige a habilidade de Lógica de que depende (ex.: `big-o` e `arrays` exigem `lacos`; `arvores` exige `recursao` nível 3; `dfs` exige `recursao` nível 2).
 - Formato do `.yaml` de um nó (requisito usa `min_level`; `strength` padrão `obrigatorio`; exercícios ficam no YAML, o texto "por que fazer" fica no TS):
 
 ```yaml
