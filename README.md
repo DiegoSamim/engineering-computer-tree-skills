@@ -1,27 +1,8 @@
 # Engineering Computer Tree Skills
 
-Um roadmap interativo para explorar Engenharia de Computação como uma árvore de habilidades. Cada área forma um ramo, e seus tópicos se conectam por conceitos e pré-requisitos. O mapa deve crescer aos poucos, acompanhando a relação entre os assuntos.
+Um mapa de estudos de computação em forma de árvore de habilidades. **Áreas** contêm **branches**; branches contêm **nós**; cada nó é uma sessão de estudo. Nós têm requisitos entre si (inclusive entre áreas) e acendem conforme você estuda.
 
-## Escopo atual
-
-Hoje, o projeto está focado na preparação para entrevistas técnicas e live coding, com conteúdos de estruturas de dados, algoritmos e padrões de resolução de problemas.
-
-- Um roadmap organizado por níveis e prioridade para orientar os estudos.
-- Conteúdo de teoria e tópicos de preparação para entrevistas.
-- Um laboratório visual de grafos, com execução passo a passo de algoritmos como BFS e DFS.
-- Acompanhamento do progresso de estudo, salvo localmente.
-
-## Direção do projeto
-
-A estrutura atual é o primeiro ramo de uma árvore maior. A expansão poderá incluir áreas como:
-
-- **Algoritmos:** padrões, estratégias e estruturas de dados conectados entre si.
-- **Grafos:** modelagem, percursos, caminhos mínimos e outros problemas relacionados.
-- **Redes:** fundamentos, protocolos, segurança e sistemas distribuídos.
-- **Hardware e arquitetura:** eletrônica, lógica digital, processadores e sistemas embarcados.
-- **Sistemas e software:** sistemas operacionais, programação, compiladores e engenharia de software.
-
-Os ramos poderão se dividir em nós menores, com ligações que indiquem o que se relaciona e o que vale estudar antes. Assim, o projeto poderá avançar de um roadmap de live coding para um mapa mais amplo da Engenharia de Computação.
+> **Em refatoração.** O projeto está deixando de ser um roadmap de live coding. O backend novo (domínio, catálogo, banco e API) está pronto; as telas da árvore vêm a seguir. Por enquanto, só o laboratório de grafos (`/lab/grafos`) está no ar. Decisões e fases: [`CLAUDE.md`](CLAUDE.md).
 
 ## Executar localmente
 
@@ -29,10 +10,10 @@ Requer Node.js 22 ou superior.
 
 ```bash
 npm install
-npm run dev
+./scripts/start.sh      # API (porta 8787) + interface (porta 5183)
 ```
 
-O Vite informa no terminal o endereço local da aplicação. Para rodar a suíte de testes, gerar o build ou verificar o código:
+Ou separados: `npm run server` e `npm run dev`. Para testar, gerar o build ou verificar o código:
 
 ```bash
 npm test
@@ -40,16 +21,26 @@ npm run build
 npm run lint
 ```
 
-## Tecnologias
+## Como o conteúdo vira catálogo
 
-React, TypeScript, Vite e Tailwind CSS. O servidor opcional usa Node.js e SQLite para armazenar o progresso localmente.
+```
+content/<area>/_area.yaml                 metadados da área (nome, cor, ícone)
+content/<area>/<branch>/_branch.yaml      metadados da branch
+content/<area>/<branch>/<no>.yaml         um nó: posição na constelação, requisitos, critérios por nível
+src/content/topics/<slug>.ts              o corpo das 12 guias de um nó publicado
+```
 
-## Estrutura do projeto
+`npm run catalog` valida tudo (inclusive ciclos de requisitos) e gera `src/generated/catalog.json`. Ele roda sozinho antes de `dev`, `build`, `test` e `server`; se o conteúdo estiver inválido, para com a lista de erros. O servidor semeia o banco a partir desse arquivo no boot.
 
-- `src/content/roadmap.ts`: catálogo do roadmap de live coding e entrevistas.
-- `src/algorithms/`: implementações e conteúdo dos algoritmos.
-- `src/simulation/`: motor que gera os passos das visualizações.
-- `src/features/`: telas do roadmap, tópicos e laboratório.
-- `server/`: API local e persistência com SQLite.
+Hoje o conteúdo cobre as 10 áreas e as 8 branches de Fundamentos (só metadados) e os nós de **Fundamentos / Padrões de resolução**, com Two Pointers completo.
 
-O roadmap de entrevistas também está detalhado em [`Roadmap_Live_Coding_Entrevistas.md`](Roadmap_Live_Coding_Entrevistas.md).
+## Estrutura
+
+- `src/domain/tree/`: regras da árvore em funções puras (estado derivado, requisitos, níveis, contadores, validação).
+- `content/`, `scripts/build-catalog.ts`: o catálogo.
+- `server/`: API local e SQLite. Veja [`server/README.md`](server/README.md).
+- `src/algorithms/`, `src/simulation/`, `src/player/`: motor das visualizações passo a passo (BFS, DFS, A*...).
+- `src/visualizers/`: visualizadores de nós (Two Pointers).
+- `docs/`: catálogo planejado, esquema do banco, design system "Constelação" e protótipo de referência.
+
+O roadmap original de entrevistas está em [`Roadmap_Live_Coding_Entrevistas.md`](Roadmap_Live_Coding_Entrevistas.md) e vai virar a trilha "Live coding".

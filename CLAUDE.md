@@ -41,7 +41,7 @@ Em caso de conflito: este arquivo > `docs/db/schema.sql` > design system > prot�
 
 - `branch`: `UNIQUE(area_id, slug)` em vez de `slug UNIQUE`, porque o catálogo repete slugs entre áreas. A chave pública é `area/branch`; as views expõem `branch_key`.
 - `node_criterion` e `exercise` ganham `slug` (estável, `UNIQUE(node_id, slug)`); critério ganha `label`. O seed faz upsert por (nó, slug) para não apagar progresso.
-- `node.visualizer TEXT`.
+- `node.visualizer TEXT` e `area.sub` (subtítulo curto, "Bases teóricas").
 - Eventos `guia_lida` / `guia_desmarcada` e tabela `user_guide` ("Marcar como lida").
 - Sem `PRAGMA` na migration (`openDatabase` liga as FKs).
 - Os slugs de `seed_exemplo.sql` (`fundamentos`, `eng-software`...) são antigos: vale `docs/catalogo.md`.
