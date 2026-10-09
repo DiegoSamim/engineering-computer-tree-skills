@@ -17,7 +17,7 @@ O progresso do roadmap antigo (`data/study.db`) não é migrado: o boot avisa e 
 
 ## Boot
 
-1. Abre o banco e aplica as migrations (`migrations/001_skill_tree.sql`, vinda de `docs/db/schema.sql` com os desvios do `CLAUDE.md`).
+1. Abre o banco e aplica as migrations (`migrations/001_skill_tree.sql`, vinda de `docs/db/schema.sql` com os desvios do `CLAUDE.md`; `002` acrescenta o evento `exercicio_desmarcado`).
 2. Lê `src/generated/catalog.json` e semeia o catálogo (`catalog/seed.ts`): idempotente por slug, sem trocar ids. Critérios e exercícios são atualizados por (nó, slug), porque o progresso aponta para eles. Um nó removido do conteúdo que tem progresso **impede o boot**: slugs são permanentes.
 3. Roda `catalog/validate.sql` (cópia de `docs/db/validate.sql`); qualquer erro impede o boot.
 4. `ProgressStore.rebuild()` refaz o estado materializado a partir do log, para os níveis acompanharem critérios que mudaram.
@@ -48,7 +48,7 @@ Eventos (`src/domain/tree/types.ts`):
 { type: 'iniciou', node }
 { type: 'criterio_marcado' | 'criterio_desmarcado', node, criterion }
 { type: 'guia_lida' | 'guia_desmarcada', node, guide }
-{ type: 'exercicio_tentado' | 'exercicio_resolvido', node, exercise }
+{ type: 'exercicio_tentado' | 'exercicio_resolvido' | 'exercicio_desmarcado', node, exercise }
 { type: 'sessao_estudo', node, seconds }
 ```
 
@@ -62,7 +62,7 @@ server/
   db.ts                 conexão, PRAGMA, transação
   http.ts               roteador mínimo, HttpError
   routes.ts             as rotas
-  migrations/           001_skill_tree.sql + runner idempotente
+  migrations/           001_skill_tree.sql, 002_exercicio_desmarcado.sql + runner idempotente
   catalog/              load (JSON gerado), seed, read, validate.sql
   progress/             events (validação de entrada), store (log + materialização), state (leitura das views)
   __tests__/            schema × domínio, catálogo, store, rotas

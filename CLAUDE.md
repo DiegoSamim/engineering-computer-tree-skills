@@ -36,7 +36,8 @@ Em caso de conflito: este arquivo > `docs/db/schema.sql` > design system > prot�
 - **Slugs são permanentes.** O progresso depende deles. Renomear exige tabela de apelidos; evite.
 - **Nó sem critérios não evolui.** Sem `node_criterion`, o nível fica em 0 e o nó só pode ser iniciado (`estudando`). Se o nó tem critérios, todo nível de 1 a `max_level` precisa de pelo menos um.
 - **XP**: `criterio_marcado` +10, `criterio_desmarcado` −10, demais eventos 0 (`xpFor` em `src/domain/tree`). Marcar o que já está marcado não grava evento.
-- **Exercício resolvido é definitivo**: não existe evento para desfazer (`exercicio_resolvido` só grava uma vez). O check fica marcado e desabilitado.
+- **Exercício resolvido se desfaz**: `exercicio_resolvido` e `exercicio_desmarcado` alternam o check (decisão de 2026-10-09, revendo a anterior). Marcar o que já está marcado, ou desmarcar o que não está, não grava evento.
+- **Na interface, "nó" se chama "habilidade"** ("Abrir habilidade", "4 / 11 habilidades", "Esta habilidade..."). No código, no banco e nos docs técnicos o modelo continua `node`.
 
 ### Desvios de `docs/db/schema.sql` (decididos)
 
@@ -44,6 +45,7 @@ Em caso de conflito: este arquivo > `docs/db/schema.sql` > design system > prot�
 - `node_criterion` e `exercise` ganham `slug` (estável, `UNIQUE(node_id, slug)`); critério ganha `label`. O seed faz upsert por (nó, slug) para não apagar progresso.
 - `node.visualizer TEXT` e `area.sub` (subtítulo curto, "Bases teóricas").
 - Eventos `guia_lida` / `guia_desmarcada` e tabela `user_guide` ("Marcar como lida").
+- Evento `exercicio_desmarcado` (migration `002`, que reconstrói `progress_event` para mudar o CHECK).
 - Sem `PRAGMA` na migration (`openDatabase` liga as FKs).
 - Os slugs de `seed_exemplo.sql` (`fundamentos`, `eng-software`...) são antigos: vale `docs/catalogo.md`.
 - Requisito de branch sem nó de tronco é cumprido por vacuidade (como na view); a validação acusa `branch_sem_tronco`.
@@ -96,6 +98,8 @@ visualizer: two-pointers      # chave num registry, nunca um if
 | `/n/:slug` | Página do nó: uma guia por vez, navegação em tronco, gaveta Domínio | `GuideRail`, `StatePill` |
 
 Comportamentos que precisam existir: transição orbe→área (orbe viaja ao centro e cresce), linhas da constelação se desenhando, clique seleciona estrela e Enter/duplo clique abre, Esc sobe um nível, ← → no carrossel e entre guias, deep link para guia (`/n/two-pointers#codigo`).
+
+Ajustes de 2026-10-09: o centro do céu mostra só o ícone de computador (sem nome nem contagem); o carrossel de branches não tem fim (dá a volta nos dois sentidos); na constelação, selecionar uma estrela leva a câmera até ela com zoom em perspectiva (estilo Skyrim) e só então o painel lateral entra deslizando, e abrir a habilidade mergulha na estrela antes de navegar.
 
 ## Design (decidido)
 
