@@ -82,6 +82,7 @@ export function exemploCatalog(): Catalog {
           { id: 'medios', level: 2, label: 'Prática', text: 'Resolver 3 exercícios médios' },
           { id: 'retencao', level: 3, label: 'Retenção', text: 'Refazer um exercício 7 dias depois' },
         ],
+        exercises: [{ id: 'two-sum-ii', title: 'Two Sum II', url: 'https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/', difficulty: 'facil' }],
       }),
       node({
         slug: 'sliding-window',
