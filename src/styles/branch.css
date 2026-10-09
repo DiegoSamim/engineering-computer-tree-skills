@@ -30,6 +30,7 @@
     text-wrap: balance;
   }
   .branch-head .stat {
+    margin-left: auto;
     font-size: 13px;
     color: var(--color-ink-faint);
     text-align: right;

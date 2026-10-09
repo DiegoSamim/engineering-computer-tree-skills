@@ -6,6 +6,8 @@ export interface Crumb {
   label: string;
   /** Ausente no último (onde você está). */
   to?: string;
+  /** Estado da navegação (ex.: qual branch centralizar ao voltar). */
+  state?: unknown;
 }
 
 /** Marca, caminho e o contador global "feitos / total nós". */
@@ -23,7 +25,9 @@ export function TopBar({ crumbs = [], done, total }: { crumbs?: Crumb[]; done: n
               /
             </span>
             {c.to ? (
-              <Link to={c.to}>{c.label}</Link>
+              <Link to={c.to} state={c.state}>
+                {c.label}
+              </Link>
             ) : (
               <span className="here" aria-current="page">
                 {c.label}

@@ -2,7 +2,13 @@ import type { TreeState } from '../domain/tree/api';
 import type { CatalogIndex } from '../domain/tree/catalogIndex';
 import { homeAreaOf } from '../domain/tree/catalogIndex';
 import { levelName } from '../domain/tree/levels';
-import { dependents, explainRequirements, isRequirementMet, type RequirementGroupView } from '../domain/tree/requirements';
+import {
+  dependents,
+  explainRequirements,
+  isRequirementMet,
+  type RequirementGroupView,
+  type RequirementItemView,
+} from '../domain/tree/requirements';
 import type { NodeDef, NodeState, PlacementRole, ProgressMap } from '../domain/tree/types';
 
 /**
@@ -133,6 +139,9 @@ export interface UnlockView {
   otherArea?: { name: string; color: string };
 }
 
+export type RequirementItem = RequirementItemView & { otherArea?: { name: string; color: string } };
+export type RequirementGroup = Omit<RequirementGroupView, 'items'> & { items: RequirementItem[] };
+
 export interface NodeView {
   node: NodeDef;
   state: NodeState;
@@ -141,7 +150,7 @@ export interface NodeView {
   homeBranch: { key: string; name: string };
   /** Selecionado numa branch que não é a casa. */
   mirror: boolean;
-  requirements: (RequirementGroupView & { items: (RequirementGroupView['items'][number] & { otherArea?: { name: string; color: string } })[] })[];
+  requirements: RequirementGroup[];
   unlocks: UnlockView[];
 }
 

@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { GraphLab } from '../features/lab/GraphLab';
 import { AreaScreen } from '../features/area/AreaScreen';
+import { BranchScreen } from '../features/branch/BranchScreen';
 import { SkyScreen } from '../features/sky/SkyScreen';
 import { AppShell, NotFound } from './AppShell';
 
@@ -11,6 +12,7 @@ export function AppRouter() {
         <Route element={<AppShell />}>
           <Route index element={<SkyScreen />} />
           <Route path="a/:area" element={<AreaScreen />} />
+          <Route path="a/:area/:branch" element={<BranchScreen />} />
           <Route path="*" element={<NotFound />} />
         </Route>
         {/* O lab de grafos tem layout próprio; vira visualizador de nós na Fase 6. */}
