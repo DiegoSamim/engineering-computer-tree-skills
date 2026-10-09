@@ -1,0 +1,7 @@
+slug: b
+title: B
+home: fund/padroes
+kind: padrao
+place: { role: tronco, x: 0.5, y: 0.2 }
+requires:
+  - { node: a }

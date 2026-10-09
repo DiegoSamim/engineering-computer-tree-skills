@@ -1,0 +1,7 @@
+slug: a
+title: A
+home: fund/outra
+kind: padrao
+place: { role: tronco, x: 0.5, y: 0.5 }
+requires:
+  - { node: fantasma }
