@@ -6,8 +6,10 @@ import { deriveStates } from '../../domain/tree/state';
 import type { ProgressMap } from '../../domain/tree/types';
 import { exemploCatalog } from '../../domain/tree/__fixtures__/exemplo';
 import {
+  cameraTransform,
   cardPosition,
   carouselLayout,
+  circularOffset,
   constellationView,
   firstBranchWithNodes,
   levelChangeMessage,
@@ -15,6 +17,7 @@ import {
   px,
   py,
   requireLine,
+  wrapIndex,
 } from '../views';
 
 const index = indexCatalog(exemploCatalog());
@@ -109,7 +112,7 @@ describe('levelChangeMessage', () => {
   it('avisa subida de nível e o que foi liberado', () => {
     const before = stateFrom({ ...base, 'two-pointers': lvl(1) });
     const after = stateFrom({ ...base, 'two-pointers': lvl(2) });
-    expect(levelChangeMessage(index, before, after, 'two-pointers')).toBe('Nível 2 atingido · Sliding Window liberado');
+    expect(levelChangeMessage(index, before, after, 'two-pointers')).toBe('Nível 2 atingido · Sliding Window liberada');
   });
 
   it('avisa subida sem liberação', () => {
@@ -126,18 +129,40 @@ describe('levelChangeMessage', () => {
 });
 
 describe('carrossel', () => {
-  it('carta entre 240 e 400px, centralizada', () => {
-    expect(carouselLayout(1280, 0)).toEqual({ cardWidth: 400, gap: 12, offset: 440 });
-    expect(carouselLayout(1280, 2).offset).toBe(440 - 2 * 412);
-    expect(carouselLayout(390, 0)).toEqual({ cardWidth: 240, gap: 0, offset: 75 });
+  it('carta entre 240 e 400px', () => {
+    expect(carouselLayout(1280)).toEqual({ cardWidth: 400, gap: 12 });
+    expect(carouselLayout(390)).toEqual({ cardWidth: 240, gap: 0 });
   });
 
-  it('classifica central, vizinha e distante', () => {
-    expect([0, 1, 2, 3].map((i) => cardPosition(i, 1))).toEqual(['near', 'on', 'near', 'far']);
+  it('não tem fim: a última carta fica à esquerda da primeira', () => {
+    expect([0, 1, 2, 7].map((i) => circularOffset(i, 0, 8))).toEqual([0, 1, 2, -1]);
+    expect([0, 6, 7].map((i) => circularOffset(i, 7, 8))).toEqual([1, -1, 0]);
+    expect(circularOffset(4, 0, 8)).toBe(4);
+    expect([wrapIndex(8, 8), wrapIndex(-1, 8), wrapIndex(3, 0)]).toEqual([0, 7, 0]);
+  });
+
+  it('classifica central, vizinha e distante dando a volta', () => {
+    expect([0, 1, 2, 3].map((i) => cardPosition(i, 0, 4))).toEqual(['on', 'near', 'far', 'near']);
   });
 
   it('abre na primeira branch com nós', () => {
     expect(firstBranchWithNodes(index, 'fund')).toBe(0);
     expect(firstBranchWithNodes(index, 'inexistente')).toBe(0);
+  });
+});
+
+describe('cameraTransform', () => {
+  it('leva a estrela ao alvo, em volta dela', () => {
+    // Cena do tamanho do viewBox: a estrela fica onde está no viewBox.
+    expect(cameraTransform({ cx: 300, cy: 260 }, { width: 600, height: 520 }, { x: 300, y: 260 }, { zoom: 2, tilt: 10 })).toBe(
+      'translate3d(300px, 260px, 0) rotateX(10deg) scale(2) translate3d(-300px, -260px, 0)',
+    );
+  });
+
+  it('respeita o encaixe "meet" do SVG (sobra horizontal centralizada)', () => {
+    // 1200 × 520: escala 1, 300px de sobra de cada lado.
+    expect(cameraTransform({ cx: 50, cy: 34 }, { width: 1200, height: 520 }, { x: 430, y: 260 }, { zoom: 1.5, tilt: 0 })).toBe(
+      'translate3d(430px, 260px, 0) rotateX(0deg) scale(1.5) translate3d(-350px, -34px, 0)',
+    );
   });
 });

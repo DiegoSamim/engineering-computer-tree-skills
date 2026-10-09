@@ -57,16 +57,11 @@
       0 0 0 11px var(--color-line);
     background: var(--color-bg);
   }
-  .core .name {
-    font-family: var(--font-display);
-    font-weight: 300;
-    font-size: clamp(14px, 2.2vw, 19px);
-    color: var(--color-ink);
-  }
-  .core .count {
-    font-size: 11px;
-    color: var(--color-ink-faint);
-    margin-top: 2px;
+  .core .core-icon {
+    width: 30%;
+    height: 30%;
+    color: var(--c);
+    filter: drop-shadow(0 0 10px var(--glow));
   }
 
   .orb {
@@ -191,57 +186,57 @@
   .area-list {
     display: none;
   }
-}
 
-@media (max-width: 640px) {
-  .stage,
-  .sky-hint {
-    display: none;
-  }
-  .sky {
-    place-items: start stretch;
-  }
-  .area-list {
-    display: grid;
-    gap: 4px;
-    width: 100%;
-  }
-  .area-row {
-    display: grid;
-    grid-template-columns: 46px 1fr auto;
-    gap: 14px;
-    align-items: center;
-    padding: 10px 6px;
-    border-radius: 10px;
-    text-align: left;
-  }
-  .area-row.open:hover {
-    background: var(--color-bg-raised);
-  }
-  .area-row .ic {
-    width: 46px;
-    height: 46px;
-    border-radius: 50%;
-    display: grid;
-    place-items: center;
-    border: 1.5px solid var(--c);
-    color: var(--c);
-    box-shadow: 0 0 14px var(--glow);
-  }
-  .area-row .ic svg {
-    width: 22px;
-    height: 22px;
-  }
-  .area-row b {
-    display: block;
-    font-weight: 500;
-  }
-  .area-row small {
-    color: var(--color-ink-faint);
-    font-size: 13px;
-  }
-  .area-row .mono {
-    font-size: 12px;
-    color: var(--color-ink-faint);
+  @media (max-width: 640px) {
+    .stage,
+    .sky-hint {
+      display: none;
+    }
+    .sky {
+      place-items: start stretch;
+    }
+    .area-list {
+      display: grid;
+      gap: 4px;
+      width: 100%;
+    }
+    .area-row {
+      display: grid;
+      grid-template-columns: 46px 1fr auto;
+      gap: 14px;
+      align-items: center;
+      padding: 10px 6px;
+      border-radius: 10px;
+      text-align: left;
+    }
+    .area-row.open:hover {
+      background: var(--color-bg-raised);
+    }
+    .area-row .ic {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      border: 1.5px solid var(--c);
+      color: var(--c);
+      box-shadow: 0 0 14px var(--glow);
+    }
+    .area-row .ic svg {
+      width: 22px;
+      height: 22px;
+    }
+    .area-row b {
+      display: block;
+      font-weight: 500;
+    }
+    .area-row small {
+      color: var(--color-ink-faint);
+      font-size: 13px;
+    }
+    .area-row .mono {
+      font-size: 12px;
+      color: var(--color-ink-faint);
+    }
   }
 }

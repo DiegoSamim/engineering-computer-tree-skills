@@ -10,7 +10,7 @@ export interface Crumb {
   state?: unknown;
 }
 
-/** Marca, caminho e o contador global "feitos / total nós". */
+/** Marca, caminho e o contador global "feitas / total habilidades". */
 export function TopBar({ crumbs = [], done, total }: { crumbs?: Crumb[]; done: number; total: number }) {
   return (
     <header className="topbar">
@@ -36,8 +36,8 @@ export function TopBar({ crumbs = [], done, total }: { crumbs?: Crumb[]; done: n
           </Fragment>
         ))}
       </nav>
-      <span className="total" aria-label={`${done} de ${total} nós concluídos`}>
-        <b>{done}</b> / {total} nós
+      <span className="total" aria-label={`${done} de ${total} habilidades concluídas`}>
+        <b>{done}</b> / {total} habilidades
       </span>
     </header>
   );

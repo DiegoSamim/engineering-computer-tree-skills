@@ -23,7 +23,7 @@ const cssVars = (vars: Record<string, string | number>) => vars as CSSProperties
 export function Constellation({ view, label, big = false, selected = null, onSelect, onOpen }: Props) {
   if (view.stars.length === 0) {
     return (
-      <svg className="constellation" viewBox={`0 0 ${SKY_W} ${SKY_H}`} role="img" aria-label={`${label}: nenhum nó ainda`}>
+      <svg className="constellation" viewBox={`0 0 ${SKY_W} ${SKY_H}`} role="img" aria-label={`${label}: nenhuma habilidade ainda`}>
         <g className="empty-stars">
           <circle cx={px(0.5)} cy={py(0.5)} r={7} />
           <circle cx={px(0.35)} cy={py(0.3)} r={4} />

@@ -12,7 +12,7 @@ interface Props {
   returnFocus: RefObject<HTMLElement | null>;
   node: NodeDef;
   progress: NodeStateView | undefined;
-  /** "Ao chegar no nível 2, Sliding Window é liberado na constelação." */
+  /** "Ao chegar no nível 2, Sliding Window é liberada na constelação." */
   hints: { title: string; minLevel: number }[];
   onToggle: (criterion: string, checked: boolean) => void;
 }
@@ -31,14 +31,14 @@ export function MasteryDrawer({ open, onClose, returnFocus, node, progress, hint
       {node.criteria.length === 0 ? (
         <>
           <h2>Domínio</h2>
-          <p>Os critérios de cada nível aparecem quando o conteúdo deste nó for escrito.</p>
+          <p>Os critérios de cada nível aparecem quando o conteúdo desta habilidade for escrito.</p>
         </>
       ) : (
         <>
           <h2>Domínio de {node.title}</h2>
           <p>
             O nível sobe quando todos os critérios dele estão marcados.
-            {hints.map((h) => ` Ao chegar no nível ${h.minLevel}, ${h.title} é liberado na constelação.`).join('')}
+            {hints.map((h) => ` Ao chegar no nível ${h.minLevel}, ${h.title} é liberada na constelação.`).join('')}
           </p>
           {levels.map((level) => {
             const criteria = node.criteria.filter((c) => c.level === level);

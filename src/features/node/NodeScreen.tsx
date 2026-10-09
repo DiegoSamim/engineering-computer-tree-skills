@@ -86,7 +86,7 @@ function NodePage({ slug }: { slug: string }) {
     if (branch) navigate(`/a/${branch.area}/${branch.slug}`, { state: { selected: slug } });
   });
 
-  if (!node || !view || !branch) return <NotFound what="Este nó" />;
+  if (!node || !view || !branch) return <NotFound what="Esta habilidade" />;
   const area = index.areas.get(branch.area)!;
 
   const emit = async (event: ProgressEventInput) => {
@@ -141,7 +141,9 @@ function NodePage({ slug }: { slug: string }) {
                   content={content}
                   node={node}
                   progress={progress}
-                  onSolve={(exercise) => void emit({ type: 'exercicio_resolvido', node: slug, exercise })}
+                  onExercise={(exercise, solved) =>
+                    void emit({ type: solved ? 'exercicio_resolvido' : 'exercicio_desmarcado', node: slug, exercise })
+                  }
                 />
                 <footer className="sec-foot">
                   <button type="button" className={`read-btn ${isRead ? 'on' : ''}`} aria-pressed={isRead} onClick={toggleRead}>
@@ -170,7 +172,7 @@ function NodePage({ slug }: { slug: string }) {
             <div className="empty-node">
               <h2>Conteúdo ainda não escrito</h2>
               <p>
-                Este nó já existe no mapa para marcar o caminho e os requisitos. A página ganha as 12 guias quando o conteúdo
+                Esta habilidade já existe no mapa para marcar o caminho e os requisitos. A página ganha as 12 guias quando o conteúdo
                 for publicado.
               </p>
               <Button variant="ghost" onClick={() => navigate(`/a/${branch.area}/${branch.slug}`, { state: { selected: slug } })}>

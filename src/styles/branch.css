@@ -2,15 +2,19 @@
 
 @layer components {
   .branch {
+    position: relative;
     flex: 1;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 340px;
+    display: flex;
+    flex-direction: column;
     min-height: 0;
+    overflow: hidden;
   }
   .sky-panel {
+    flex: 1;
     display: flex;
     flex-direction: column;
     min-width: 0;
+    min-height: 0;
     padding: 4px 24px 20px;
   }
   .branch-head {
@@ -19,6 +23,7 @@
     justify-content: space-between;
     gap: 16px;
     flex-wrap: wrap;
+    transition: padding var(--t-slow) var(--ease);
   }
   .branch-head h1 {
     margin: 4px 0 0;
@@ -42,14 +47,40 @@
     color: var(--color-ink);
     font-family: var(--font-display);
   }
+
+  /* Câmera: a cena (o SVG) é transformada em perspectiva para aproximar a
+     estrela selecionada, como no Skyrim. O céu recorta o que sobra. */
   .big-sky {
+    position: relative;
     flex: 1;
     min-height: 340px;
+    perspective: 1100px;
+    overflow: hidden;
     display: grid;
     place-items: center;
   }
-  .big-sky .constellation {
-    max-height: calc(100vh - 230px);
+  .scene {
+    position: absolute;
+    inset: 0;
+    transform-origin: 0 0;
+    transform-style: preserve-3d;
+    transition:
+      transform 900ms var(--ease),
+      opacity 520ms var(--ease);
+  }
+  .scene .constellation {
+    width: 100%;
+    height: 100%;
+  }
+  .scene.diving {
+    transition:
+      transform 520ms cubic-bezier(0.5, 0, 0.75, 0),
+      opacity 520ms cubic-bezier(0.5, 0, 0.75, 0);
+    opacity: 0;
+  }
+  .branch.has-sel .constellation .star:not(.sel) {
+    opacity: 0.55;
+    transition: opacity var(--t-med);
   }
   .empty-sky {
     color: var(--color-ink-faint);
@@ -57,16 +88,60 @@
     max-width: 34ch;
     font-size: 14px;
   }
+  .sky-foot {
+    transition: padding var(--t-slow) var(--ease);
+  }
+  .pick-hint {
+    margin: 0 0 6px;
+    color: var(--color-ink-faint);
+    font-size: 13px;
+  }
 
+  /* Painel: entra deslizando quando uma estrela é selecionada. */
   .panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 5;
+    width: 340px;
     border-left: 1px solid var(--color-line);
-    background: color-mix(in srgb, var(--color-bg-raised) 88%, transparent);
+    background: color-mix(in srgb, var(--color-bg-raised) 92%, transparent);
     padding: 22px 22px 28px;
     display: flex;
     flex-direction: column;
     gap: 18px;
     min-width: 0;
     overflow-y: auto;
+    transform: translateX(100%);
+    visibility: hidden;
+    transition:
+      transform var(--t-slow) var(--ease),
+      visibility 0s linear var(--t-slow);
+  }
+  .panel.on {
+    transform: none;
+    visibility: visible;
+    transition: transform var(--t-slow) var(--ease);
+  }
+  .branch.has-sel .branch-head,
+  .branch.has-sel .sky-foot {
+    padding-right: 340px;
+  }
+  .panel-close {
+    position: absolute;
+    right: 14px;
+    top: 14px;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-md);
+    color: var(--color-ink-faint);
+    font-size: 20px;
+    line-height: 1;
+  }
+  .panel-close:hover {
+    color: var(--color-ink);
+    background: var(--color-bg-panel);
   }
   .panel .hint {
     margin: 0;
@@ -150,19 +225,28 @@
     padding-left: 22px;
     letter-spacing: 0.1em;
   }
-}
 
-@media (max-width: 900px) {
-  .branch {
-    grid-template-columns: 1fr;
+  @media (max-width: 900px) {
+    /* No celular o painel é uma folha que sobe por baixo. */
+    .panel {
+      position: fixed;
+      top: auto;
+      left: 0;
+      width: auto;
+      max-height: 58vh;
+      border-left: 0;
+      border-top: 1px solid var(--color-line);
+      border-radius: 16px 16px 0 0;
+      transform: translateY(100%);
+    }
+    .branch.has-sel .branch-head,
+    .branch.has-sel .sky-foot {
+      padding-right: 0;
+    }
   }
-  .panel {
-    border-left: 0;
-    border-top: 1px solid var(--color-line);
-  }
-}
-@media (max-width: 640px) {
-  .sky-panel {
-    padding-inline: 16px;
+  @media (max-width: 640px) {
+    .sky-panel {
+      padding-inline: 16px;
+    }
   }
 }

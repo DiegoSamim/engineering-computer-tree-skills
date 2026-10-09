@@ -76,7 +76,7 @@ export function NodePanel({ view, onOpen, onGoHome }: Props) {
       )}
 
       <div className="actions">
-        <Button onClick={() => onOpen(node.slug)}>Abrir nó</Button>
+        <Button onClick={() => onOpen(node.slug)}>Abrir habilidade</Button>
         {view.mirror && (
           <Button variant="ghost" onClick={() => onGoHome(view)}>
             Ir para a casa

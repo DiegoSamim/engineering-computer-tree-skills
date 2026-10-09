@@ -5,7 +5,7 @@ import type { AreaIcon } from '../domain/tree/types';
  * Ícones de linha: traço 1.5, cantos arredondados, grade de 24. Uma figura
  * por área; o resto são controles. Sem emoji, sem ícones preenchidos.
  */
-const PATHS: Record<AreaIcon | 'brand' | 'left' | 'right' | 'play' | 'pause' | 'reset' | 'check', ReactNode> = {
+const PATHS: Record<AreaIcon | 'computador' | 'brand' | 'left' | 'right' | 'play' | 'pause' | 'reset' | 'check', ReactNode> = {
   capelo: (
     <>
       <path d="M3 9l9-4 9 4-9 4-9-4z" />
@@ -57,6 +57,12 @@ const PATHS: Record<AreaIcon | 'brand' | 'left' | 'right' | 'play' | 'pause' | '
       <rect x="13.5" y="3.5" width="7" height="7" rx="1" transform="rotate(12 17 7)" />
       <rect x="3.5" y="13.5" width="7" height="7" rx="1" />
       <rect x="13.5" y="13.5" width="7" height="7" rx="1" />
+    </>
+  ),
+  computador: (
+    <>
+      <rect x="4.5" y="5" width="15" height="10.5" rx="1.5" />
+      <path d="M2.5 18.5h19" />
     </>
   ),
   brand: (

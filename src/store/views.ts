@@ -220,7 +220,7 @@ export function levelChangeMessage(index: CatalogIndex, before: TreeState, after
     .map((s) => index.nodes.get(s)?.title ?? s);
   const head = `Nível ${to} atingido`;
   if (freed.length === 0) return head;
-  return `${head} · ${freed.join(', ')} ${freed.length === 1 ? 'liberado' : 'liberados'}`;
+  return `${head} · ${freed.join(', ')} ${freed.length === 1 ? 'liberada' : 'liberadas'}`;
 }
 
 export function levelTitle(level: number): string {
@@ -232,20 +232,30 @@ export function levelTitle(level: number): string {
 export interface CarouselLayout {
   cardWidth: number;
   gap: number;
-  /** translateX da trilha para centralizar a carta `current`. */
-  offset: number;
 }
 
-/** Carta entre 240 e 400px (32% da tela), centralizada. Como o protótipo. */
-export function carouselLayout(viewport: number, current: number): CarouselLayout {
-  const cardWidth = Math.min(400, Math.max(240, viewport * 0.32));
-  const gap = viewport < 640 ? 0 : 12;
-  return { cardWidth, gap, offset: viewport / 2 - (current * (cardWidth + gap) + cardWidth / 2) };
+/** Carta entre 240 e 400px (32% da tela). Como o protótipo. */
+export function carouselLayout(viewport: number): CarouselLayout {
+  return { cardWidth: Math.min(400, Math.max(240, viewport * 0.32)), gap: viewport < 640 ? 0 : 12 };
 }
 
-export function cardPosition(i: number, current: number): 'on' | 'near' | 'far' {
-  if (i === current) return 'on';
-  return Math.abs(i - current) === 1 ? 'near' : 'far';
+/** Índice dentro de 0..n-1, dando a volta nos dois sentidos. */
+export function wrapIndex(i: number, n: number): number {
+  return n === 0 ? 0 : ((i % n) + n) % n;
+}
+
+/**
+ * Distância circular da carta `i` até a central, em (−n/2, n/2]: o carrossel
+ * não tem fim, então a última carta fica à esquerda da primeira.
+ */
+export function circularOffset(i: number, current: number, n: number): number {
+  const d = wrapIndex(i - current, n);
+  return d > n / 2 ? d - n : d;
+}
+
+export function cardPosition(i: number, current: number, n: number): 'on' | 'near' | 'far' {
+  const d = Math.abs(circularOffset(i, current, n));
+  return d === 0 ? 'on' : d === 1 ? 'near' : 'far';
 }
 
 /** Primeira branch da área que tem nós; é onde o carrossel abre. */
@@ -254,9 +264,40 @@ export function firstBranchWithNodes(index: CatalogIndex, area: string): number 
   return Math.max(0, branches.findIndex((b) => (index.placementsByBranch.get(b.key) ?? []).length > 0));
 }
 
-/** O que um nó libera e a partir de qual nível ("Ao chegar no nível 2, Sliding Window é liberado"). */
+/** O que um nó libera e a partir de qual nível ("Ao chegar no nível 2, Sliding Window é liberada"). */
 export function unlockHints(index: CatalogIndex, slug: string): { title: string; minLevel: number }[] {
   return index.catalog.nodes.flatMap((n) =>
     n.requires.filter((r) => r.node === slug && r.strength === 'obrigatorio').map((r) => ({ title: n.title, minLevel: r.minLevel })),
   );
+}
+
+// ── Câmera da constelação ─────────────────────────────────────────────────
+
+export interface CameraShot {
+  zoom: number;
+  /** Inclinação em X, em graus: o topo da constelação recua, como no Skyrim. */
+  tilt: number;
+}
+
+/** Aproximar para ver a estrela selecionada; mergulhar ao abrir a habilidade. */
+export const CAMERA_FOCUS: CameraShot = { zoom: 1.75, tilt: 16 };
+export const CAMERA_DIVE: CameraShot = { zoom: 6, tilt: 24 };
+
+/**
+ * Transformação CSS que leva a estrela (em coordenadas do viewBox) até o
+ * ponto `target` da cena, aproximando e inclinando em volta dela. A cena é um
+ * SVG de `box` px com preserveAspectRatio "meet" (centralizado). A lista de
+ * funções é sempre a mesma, para o navegador interpolar de uma estrela a outra.
+ */
+export function cameraTransform(
+  star: { cx: number; cy: number },
+  box: { width: number; height: number },
+  target: { x: number; y: number },
+  shot: CameraShot,
+): string {
+  const k = Math.min(box.width / SKY_W, box.height / SKY_H);
+  const x = (box.width - SKY_W * k) / 2 + star.cx * k;
+  const y = (box.height - SKY_H * k) / 2 + star.cy * k;
+  const r = (n: number) => Math.round(n * 100) / 100;
+  return `translate3d(${r(target.x)}px, ${r(target.y)}px, 0) rotateX(${shot.tilt}deg) scale(${shot.zoom}) translate3d(${r(-x)}px, ${r(-y)}px, 0)`;
 }

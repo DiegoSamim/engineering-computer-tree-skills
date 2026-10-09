@@ -14,11 +14,12 @@ interface Props {
   content: TopicContent;
   node: NodeDef;
   progress: NodeStateView | undefined;
-  onSolve: (exercise: string) => void;
+  /** Marca ou desmarca um exercício como resolvido. */
+  onExercise: (exercise: string, solved: boolean) => void;
 }
 
 /** O corpo de uma guia. O texto vem do TS do nó; exercícios e visualizador, do catálogo. */
-export function GuideBody({ id, content, node, progress, onSolve }: Props) {
+export function GuideBody({ id, content, node, progress, onExercise }: Props) {
   switch (id) {
     case 'visao-geral':
       return <Prose paragraphs={content.whatIsIt} />;
@@ -68,7 +69,7 @@ export function GuideBody({ id, content, node, progress, onSolve }: Props) {
     case 'erros-comuns':
       return <List items={content.commonMistakes} className="warn" />;
     case 'exercicios':
-      return <Exercises node={node} why={content.exerciseWhy} progress={progress} onSolve={onSolve} />;
+      return <Exercises node={node} why={content.exerciseWhy} progress={progress} onExercise={onExercise} />;
     case 'resumo':
       return <List items={content.summary} className="yes" />;
     case 'revisao':
@@ -97,7 +98,7 @@ function List({ items, className = '' }: { items: string[]; className?: string }
 }
 
 function Visualization({ visualizer }: { visualizer?: string }) {
-  return renderVisualizer(visualizer) ?? <p className="guide-note">Este nó ainda não tem visualização.</p>;
+  return renderVisualizer(visualizer) ?? <p className="guide-note">Esta habilidade ainda não tem visualização.</p>;
 }
 
 function Examples({ examples }: { examples: TopicContent['examples'] }) {
@@ -168,12 +169,12 @@ function Exercises({
   node,
   why,
   progress,
-  onSolve,
+  onExercise,
 }: {
   node: NodeDef;
   why: Record<string, string>;
   progress: NodeStateView | undefined;
-  onSolve: (exercise: string) => void;
+  onExercise: (exercise: string, solved: boolean) => void;
 }) {
   if (node.exercises.length === 0) return <p className="guide-note">Nenhum exercício cadastrado ainda.</p>;
   return (
@@ -185,9 +186,8 @@ function Exercises({
             <button
               type="button"
               aria-pressed={solved}
-              disabled={solved}
-              aria-label={solved ? `${e.title}: resolvido` : `Marcar ${e.title} como resolvido`}
-              onClick={() => onSolve(e.id)}
+              aria-label={solved ? `Desmarcar ${e.title}` : `Marcar ${e.title} como resolvido`}
+              onClick={() => onExercise(e.id, !solved)}
             >
               <Check on={solved} />
             </button>

@@ -31,7 +31,7 @@ export function GuideRail({ guides, current, read, onSelect, meta }: Props) {
   }, [currentIndex]);
 
   return (
-    <nav className="guide" aria-label="Guias do nó">
+    <nav className="guide" aria-label="Guias da habilidade">
       <div className="rail">
         <ol>
           {guides.map((g, i) => (

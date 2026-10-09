@@ -62,13 +62,8 @@ export function SkyScreen() {
                 />
               ))}
             </svg>
-            <div className="core">
-              <div>
-                <div className="name">Computação</div>
-                <div className="count mono">
-                  {state.totals.done} / {state.totals.total} nós
-                </div>
-              </div>
+            <div className="core" role="img" aria-label="Computação">
+              <Icon name="computador" className="core-icon" />
             </div>
             {points.map((p, i) => {
               const count = state.areas[p.area.slug] ?? { done: 0, total: 0 };

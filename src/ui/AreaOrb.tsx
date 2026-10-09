@@ -58,7 +58,7 @@ export function AreaOrb({ name, icon, color, x, y, i, done, total, open, picked,
       type="button"
       className={`orb open ${picked ? 'picked' : ''}`}
       style={style}
-      aria-label={`${name}: ${done} de ${total} nós`}
+      aria-label={`${name}: ${done} de ${total} habilidades`}
       onClick={onOpen}
       onMouseEnter={() => onHover(true)}
       onMouseLeave={() => onHover(false)}

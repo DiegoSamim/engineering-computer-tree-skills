@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperti
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { NotFound, PageTop } from '../../app/AppShell';
 import { useEscape } from '../../app/useEscape';
-import { cardPosition, carouselLayout, constellationView, firstBranchWithNodes } from '../../store/views';
+import { cardPosition, carouselLayout, circularOffset, constellationView, firstBranchWithNodes, wrapIndex } from '../../store/views';
 import { useReady } from '../../store/useTree';
 import { BranchCard } from '../../ui/BranchCard';
 import { Icon } from '../../ui/Icon';
@@ -11,8 +11,9 @@ import { Icon } from '../../ui/Icon';
 const SWIPE = 50;
 
 /**
- * Área: carrossel de branches. A carta central abre a constelação; as
- * vizinhas se centralizam. Setas, pontos, ← → e arrastar navegam.
+ * Área: carrossel de branches, sem fim nos dois sentidos. A carta central
+ * abre a constelação; as vizinhas se centralizam. Setas, pontos, ← → e
+ * arrastar navegam.
  */
 export function AreaScreen() {
   const { area = '' } = useParams();
@@ -32,7 +33,11 @@ function AreaCarousel({ slug }: { slug: string }) {
   // Voltando de uma branch (Esc ou migalha), o carrossel abre nela.
   const from = (location.state as { branch?: string } | null)?.branch;
   const initial = Math.max(0, from ? branches.findIndex((b) => b.key === from) : firstBranchWithNodes(index, slug));
-  const [current, setCurrent] = useState(initial);
+  // O índice anterior junto: a carta que pula mais de uma posição entre os
+  // dois deu a volta e troca de ponta sem atravessar a tela.
+  const [{ current, from: previousIndex }, setPosition] = useState({ current: initial, from: initial });
+  const setCurrent = (next: number | ((i: number) => number)) =>
+    setPosition((p) => ({ current: typeof next === 'function' ? next(p.current) : next, from: p.current }));
 
   const carousel = useRef<HTMLDivElement>(null);
   const cards = useRef<(HTMLButtonElement | null)[]>([]);
@@ -48,7 +53,7 @@ function AreaCarousel({ slug }: { slug: string }) {
 
   const shift = (delta: number, focus = false) => {
     setCurrent((i) => {
-      const next = Math.min(branches.length - 1, Math.max(0, i + delta));
+      const next = wrapIndex(i + delta, branches.length);
       if (focus) requestAnimationFrame(() => cards.current[next]?.focus({ preventScroll: true }));
       return next;
     });
@@ -85,7 +90,8 @@ function AreaCarousel({ slug }: { slug: string }) {
   if (!area) return <NotFound what="Esta área" />;
 
   const count = state.areas[slug] ?? { done: 0, total: 0 };
-  const layout = carouselLayout(viewport, current);
+  const layout = carouselLayout(viewport);
+  const offsets = branches.map((_, i) => circularOffset(i, current, branches.length));
 
   const onCard = (i: number) => {
     if (swiped.current) return;
@@ -100,20 +106,20 @@ function AreaCarousel({ slug }: { slug: string }) {
         <div className="area-head">
           <div className="eyebrow">{area.name}</div>
           <p>
-            {area.sub} · <span className="mono">{count.done}/{count.total}</span> nós concluídos · {branches.length} branches
+            {area.sub} · <span className="mono">{count.done}/{count.total}</span> habilidades concluídas · {branches.length} branches
           </p>
         </div>
 
         {branches.length === 0 ? (
           <div className="status-screen">
-            <p className="empty-sky">Esta área ainda não tem branches. Ela ganha a primeira quando um tópico dela for estudado.</p>
+            <p className="empty-sky">Esta área ainda não tem branches. Ela ganha a primeira quando o conteúdo dela começar a ser escrito.</p>
           </div>
         ) : (
           <>
             <div className="carousel" ref={carousel} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
               <div
                 className="track"
-                style={{ '--w': `${layout.cardWidth}px`, '--gap': `${layout.gap}px`, transform: `translateX(${layout.offset}px)` } as CSSProperties}
+                style={{ '--w': `${layout.cardWidth}px` } as CSSProperties}
               >
                 {branches.map((b, i) => (
                   <BranchCard
@@ -125,14 +131,16 @@ function AreaCarousel({ slug }: { slug: string }) {
                     view={views[i]}
                     done={state.branches[b.key]?.done ?? 0}
                     total={state.branches[b.key]?.total ?? 0}
-                    position={cardPosition(i, current)}
+                    position={cardPosition(i, current, branches.length)}
+                    offsetX={offsets[i] * (layout.cardWidth + layout.gap)}
+                    jump={Math.abs(offsets[i] - circularOffset(i, previousIndex, branches.length)) > 1}
                     onClick={() => onCard(i)}
                   />
                 ))}
               </div>
             </div>
             <nav className="pager" aria-label="Branches">
-              <button type="button" aria-label="Branch anterior" disabled={current === 0} onClick={() => shift(-1)}>
+              <button type="button" aria-label="Branch anterior" onClick={() => shift(-1)}>
                 <Icon name="left" />
               </button>
               <span className="dots">
@@ -149,12 +157,7 @@ function AreaCarousel({ slug }: { slug: string }) {
                   </button>
                 ))}
               </span>
-              <button
-                type="button"
-                aria-label="Próxima branch"
-                disabled={current === branches.length - 1}
-                onClick={() => shift(1)}
-              >
+              <button type="button" aria-label="Próxima branch" onClick={() => shift(1)}>
                 <Icon name="right" />
               </button>
             </nav>
