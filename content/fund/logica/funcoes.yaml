@@ -1,0 +1,30 @@
+slug: funcoes
+title: "Funções"
+home: fund/logica
+kind: conceito
+content: planejado
+max_level: 3
+est_minutes: 60
+summary: "Dividir o programa em partes reutilizáveis, com parâmetros, retorno e escopo."
+place: { role: tronco, x: 0.56, y: 0.2 }
+requires:
+  - { node: lacos }
+levels:
+  - level: 1
+    name: Entendi
+    criteria:
+      - id: parametros-retorno
+        label: "Estrutura"
+        text: "Definir funções com parâmetros e retorno."
+  - level: 2
+    name: Pratiquei
+    criteria:
+      - id: escopo-referencia
+        label: "Escopo"
+        text: "Explicar escopo, passagem por valor e por referência, e efeitos colaterais."
+  - level: 3
+    name: Dominei
+    criteria:
+      - id: decompor-em-funcoes
+        label: "Decomposição"
+        text: "Decompor um programa em funções pequenas com nomes que dizem o que fazem."

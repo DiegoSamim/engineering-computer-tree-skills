@@ -1,0 +1,30 @@
+slug: entrada-saida
+title: "Entrada e saída"
+home: fund/logica
+kind: conceito
+content: planejado
+max_level: 3
+est_minutes: 30
+summary: "Ler dados de quem usa o programa e mostrar resultados no formato pedido."
+place: { role: lateral, x: 0.16, y: 0.74 }
+requires:
+  - { node: variaveis-tipos }
+levels:
+  - level: 1
+    name: Entendi
+    criteria:
+      - id: ler-processar-imprimir
+        label: "Básico"
+        text: "Ler um valor, processar e imprimir o resultado."
+  - level: 2
+    name: Pratiquei
+    criteria:
+      - id: varias-linhas-formatar
+        label: "Formatação"
+        text: "Ler várias linhas ou valores e formatar a saída (casas decimais, alinhamento)."
+  - level: 3
+    name: Dominei
+    criteria:
+      - id: parsing-juiz
+        label: "Parsing"
+        text: "Fazer o parsing de uma entrada no formato de juiz online sem erro."

@@ -1,0 +1,28 @@
+slug: algoritmos
+title: "Algoritmos e decomposição"
+home: fund/logica
+kind: conceito
+content: planejado
+max_level: 3
+est_minutes: 40
+summary: "Transformar um problema em passos claros que o computador executa: entrada, processamento e saída."
+place: { role: tronco, x: 0.5, y: 0.92 }
+levels:
+  - level: 1
+    name: Entendi
+    criteria:
+      - id: entrada-processamento-saida
+        label: "Modelagem"
+        text: "Descrever a entrada, o processamento e a saída de um problema simples."
+  - level: 2
+    name: Pratiquei
+    criteria:
+      - id: decompor-passos
+        label: "Decomposição"
+        text: "Decompor um problema do dia a dia em passos ordenados e sem ambiguidade."
+  - level: 3
+    name: Dominei
+    criteria:
+      - id: planejar-antes
+        label: "Planejamento"
+        text: "Escrever o passo a passo de um problema novo antes de começar a codar, sem pular etapas."

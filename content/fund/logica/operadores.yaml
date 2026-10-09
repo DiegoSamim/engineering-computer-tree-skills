@@ -1,0 +1,30 @@
+slug: operadores
+title: "Operadores e expressões"
+home: fund/logica
+kind: conceito
+content: planejado
+max_level: 3
+est_minutes: 40
+summary: "Calcular e comparar valores com operadores aritméticos, relacionais e de módulo."
+place: { role: tronco, x: 0.54, y: 0.68 }
+requires:
+  - { node: variaveis-tipos }
+levels:
+  - level: 1
+    name: Entendi
+    criteria:
+      - id: usar-operadores
+        label: "Operadores"
+        text: "Usar operadores aritméticos, relacionais e o módulo (resto da divisão)."
+  - level: 2
+    name: Pratiquei
+    criteria:
+      - id: precedencia-divisao
+        label: "Precisão"
+        text: "Acertar a precedência e a diferença entre divisão inteira e real."
+  - level: 3
+    name: Dominei
+    criteria:
+      - id: expressoes-classicas
+        label: "Aplicação"
+        text: "Montar expressões para problemas clássicos: par ou ímpar, ano bissexto, dígitos de um número."

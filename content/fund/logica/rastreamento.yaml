@@ -1,0 +1,30 @@
+slug: rastreamento
+title: "Teste de mesa"
+home: fund/logica
+kind: conceito
+content: planejado
+max_level: 3
+est_minutes: 30
+summary: "Prever o que o código faz sem executar, simulando à mão o valor de cada variável."
+place: { role: lateral, x: 0.18, y: 0.3 }
+requires:
+  - { node: lacos }
+levels:
+  - level: 1
+    name: Entendi
+    criteria:
+      - id: tabela-de-variaveis
+        label: "Simulação"
+        text: "Montar a tabela de variáveis passo a passo."
+  - level: 2
+    name: Pratiquei
+    criteria:
+      - id: achar-erro-laco
+        label: "Diagnóstico"
+        text: "Achar o erro de um laço por teste de mesa."
+  - level: 3
+    name: Dominei
+    criteria:
+      - id: dry-run-bordas
+        label: "Bordas"
+        text: "Fazer o dry run dos casos de borda (vazio, um elemento) antes de executar."

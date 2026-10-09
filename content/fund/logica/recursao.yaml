@@ -1,0 +1,34 @@
+slug: recursao
+title: "Recursão"
+home: fund/logica
+kind: conceito
+content: planejado
+max_level: 3
+est_minutes: 60
+summary: "Uma função resolve um problema chamando a si mesma: caso base, pilha de chamadas e árvore de chamadas."
+place: { role: tronco, x: 0.46, y: 0.07 }
+mirrors:
+  - { branch: fund/padroes, role: lateral, x: 0.82, y: 0.26 }
+requires:
+  - { node: funcoes, min_level: 2 }
+related:
+  - { node: lacos, type: compara_com }
+levels:
+  - level: 1
+    name: Entendi
+    criteria:
+      - id: caso-base-passo
+        label: "Estrutura"
+        text: "Identificar o caso base e o passo recursivo."
+  - level: 2
+    name: Pratiquei
+    criteria:
+      - id: pilha-arvore
+        label: "Execução"
+        text: "Desenhar a pilha e a árvore de chamadas e prever o retorno."
+  - level: 3
+    name: Dominei
+    criteria:
+      - id: recursao-iteracao
+        label: "Domínio"
+        text: "Converter recursão em iteração e vice-versa, e reconhecer um caso base inalcançável."

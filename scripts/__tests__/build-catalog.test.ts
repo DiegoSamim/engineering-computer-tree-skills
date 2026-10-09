@@ -28,12 +28,21 @@ describe('catálogo real (content/)', () => {
     expect(errors).toEqual([]);
   });
 
-  it('tem as 10 áreas, as 8 branches de Fundamentos e os nós de Padrões', () => {
+  it('tem as 10 áreas, as 8 branches de Fundamentos e as habilidades de Lógica e Padrões', () => {
     expect(catalog.areas.map((a) => a.slug)).toEqual(['fund', 'hw', 'cloud', 'dados', 'seg', 'sis', 'dev', 'redes', 'ia', 'es']);
     expect(catalog.branches.every((b) => b.area === 'fund')).toBe(true);
     expect(catalog.branches).toHaveLength(8);
-    expect(catalog.nodes.every((n) => n.home === 'fund/padroes')).toBe(true);
-    expect(catalog.nodes).toHaveLength(9);
+    const homes = catalog.nodes.reduce<Record<string, number>>((acc, n) => ({ ...acc, [n.home]: (acc[n.home] ?? 0) + 1 }), {});
+    expect(homes).toEqual({ 'fund/logica': 12, 'fund/padroes': 9 });
+  });
+
+  it('Lógica é a base: todas as suas habilidades têm critérios e Padrões depende dela', () => {
+    const logica = catalog.nodes.filter((n) => n.home === 'fund/logica');
+    expect(logica.every((n) => [1, 2, 3].every((l) => n.criteria.some((c) => c.level === l)))).toBe(true);
+    const node = (slug: string) => catalog.nodes.find((n) => n.slug === slug)!;
+    expect(node('two-pointers').requires).toContainEqual(expect.objectContaining({ node: 'lacos', strength: 'obrigatorio' }));
+    expect(node('backtracking').requires).toContainEqual(expect.objectContaining({ node: 'recursao', minLevel: 2 }));
+    expect(node('recursao').placements.map((p) => p.branch)).toEqual(['fund/logica', 'fund/padroes']);
   });
 
   it('Two Pointers aponta para o corpo em TS e tem critérios em todo nível', () => {
@@ -61,7 +70,7 @@ describe('build-catalog (CLI)', () => {
   it('passa no conteúdo real', () => {
     const { code, output } = runCli(['--check']);
     expect(code).toBe(0);
-    expect(output).toContain('10 áreas · 8 branches · 9 nós · 0 erros');
+    expect(output).toContain('10 áreas · 8 branches · 21 nós · 0 erros');
   });
 
   it('sai com código 1 quando o catálogo é inválido', () => {
