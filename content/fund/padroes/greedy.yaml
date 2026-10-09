@@ -1,0 +1,9 @@
+slug: greedy
+title: Greedy
+home: fund/padroes
+kind: padrao
+content: planejado
+summary: Escolher o melhor passo local quando dá para provar que ele não fecha caminhos.
+place: { role: tronco, x: 0.18, y: 0.3 }
+requires:
+  - { node: ordenacao, min_level: 2 }

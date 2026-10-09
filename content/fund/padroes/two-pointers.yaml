@@ -1,0 +1,55 @@
+slug: two-pointers
+title: Two Pointers
+home: fund/padroes
+kind: padrao
+content: publicado
+max_level: 3
+est_minutes: 45
+summary: Dois índices que se movem de forma coordenada, eliminando possibilidades a cada passo.
+place: { role: tronco, x: 0.5, y: 0.7 }
+requires:
+  # Ordenação ainda não tem conteúdo; como obrigatório, travaria Two Pointers.
+  - { node: ordenacao, strength: recomendado }
+related:
+  - { node: sliding-window, type: compara_com }
+levels:
+  - level: 1
+    name: Entendi
+    criteria:
+      - id: reconhecimento
+        label: Reconhecimento
+        text: Ver "par ou tripla em array ordenado" num enunciado novo e levantar Two Pointers sem receber o nome do tópico.
+      - id: modelagem
+        label: Modelagem
+        text: "Enunciar o invariante: tudo fora do intervalo [left, right] já foi descartado com segurança."
+      - id: correcao
+        label: Correção
+        text: Explicar por que mover o ponteiro escolhido nunca pula a resposta — o argumento, não o passo a passo.
+  - level: 2
+    name: Pratiquei
+    criteria:
+      - id: implementacao
+        label: Implementação
+        text: Escrever o template de extremos opostos e o de fast/slow sem consultar nada.
+      - id: complexidade
+        label: Complexidade
+        text: Justificar O(n) tempo / O(1) espaço, e lembrar do O(n log n) quando a ordenação faz parte da solução.
+      - id: validacao
+        label: Validação
+        text: Testar array vazio, um elemento, duplicados, nenhum par válido e o par nos extremos.
+  - level: 3
+    name: Dominei
+    criteria:
+      - id: retencao
+        label: Retenção
+        text: Refazer Two Sum II e Container With Most Water dias depois, sem olhar a solução.
+      - id: performance
+        label: Performance
+        text: Resolver verbalizando o invariante e declarando a complexidade, dentro do tempo.
+exercises:
+  - { id: two-sum-ii, title: Two Sum II — Input Array Is Sorted, url: "https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/", difficulty: facil }
+  - { id: valid-palindrome, title: Valid Palindrome, url: "https://leetcode.com/problems/valid-palindrome/", difficulty: facil }
+  - { id: container-most-water, title: Container With Most Water, url: "https://leetcode.com/problems/container-with-most-water/", difficulty: medio }
+  - { id: three-sum, title: 3Sum, url: "https://leetcode.com/problems/3sum/", difficulty: medio }
+  - { id: sort-colors, title: Sort Colors, url: "https://leetcode.com/problems/sort-colors/", difficulty: medio }
+visualizer: two-pointers

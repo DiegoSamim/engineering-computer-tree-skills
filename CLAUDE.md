@@ -49,11 +49,11 @@ Em caso de conflito: este arquivo > `docs/db/schema.sql` > design system > prot�
 
 ## Conteúdo (decidido)
 
-- O conteúdo vive no git, um arquivo por nó: `content/<area>/<branch>/<no>.mdx`, com frontmatter YAML.
+- O conteúdo vive no git. **Metadados** de cada nó: `content/<area>/<branch>/<no>.yaml` (os campos do formato abaixo). **Corpo** das guias: `src/content/topics/<slug>.ts` (formato `TopicContent`). Decisão de 2026-10-09: **sem MDX por enquanto**; nó `publicado` exige o arquivo TS.
 - Metadados de área e branch: `content/<area>/_area.yaml`, `content/<area>/<branch>/_branch.yaml`.
 - Um script (`scripts/build-catalog.ts`) lê o frontmatter, valida (as mesmas regras de `validate.sql`, inclusive ciclos) e gera `src/generated/catalog.json` (não versionado; os scripts npm `pre*` o regeneram). O servidor semeia o SQLite no boot a partir desse JSON, de forma idempotente por slug. O build falha se a validação falhar.
 - **Escopo inicial do conteúdo: só a área `fund` e a branch `fund/padroes`.** As outras áreas e branches de `docs/catalogo.md` entram depois.
-- Frontmatter de um nó (formato alvo; ajuste com justificativa se algo não couber):
+- Formato do `.yaml` de um nó (requisito usa `min_level`; `strength` padrão `obrigatorio`; exercícios ficam no YAML, o texto "por que fazer" fica no TS):
 
 ```yaml
 slug: two-pointers
@@ -82,7 +82,7 @@ levels:
 visualizer: two-pointers      # chave num registry, nunca um if
 ```
 
-- O corpo MDX tem as **12 guias** do arquétipo `padrao`, nesta ordem e com estes ids: `visao-geral`, `intuicao`, `analogia`, `visualizacao`, `quando-usar`, `complexidade`, `exemplos`, `codigo`, `erros-comuns`, `exercicios`, `resumo`, `revisao`. Cada guia é um componente `<Guide id="...">` ou um heading `##` mapeado; escolha um e documente. Outros arquétipos (conceito, ferramenta, caso) terão conjuntos próprios mais tarde; não os invente agora.
+- O corpo tem as **12 guias** do arquétipo `padrao`, nesta ordem e com estes ids: `visao-geral`, `intuicao`, `analogia`, `visualizacao`, `quando-usar`, `complexidade`, `exemplos`, `codigo`, `erros-comuns`, `exercicios`, `resumo`, `revisao`. No TS, cada guia é um campo de `TopicContent`; os ids ficam em `src/domain/tree/guides.ts`. Outros arquétipos (conceito, ferramenta, caso) terão conjuntos próprios mais tarde; não os invente agora.
 - Visualizadores ficam em `src/visualizers/<chave>/` e são registrados num registry. Reaproveite o motor existente (`src/simulation/`, `src/player/`) e os algoritmos de grafos (`src/algorithms/`): eles viram visualizadores dos nós BFS, DFS, A* etc.
 
 ## Telas e rotas (decidido)
@@ -110,7 +110,7 @@ Siga `docs/design-system/`. O resumo inegociável:
 
 ## Stack
 
-Mantém: React 19, TypeScript, Vite, Tailwind 4, Zustand, React Router, Vitest, oxlint, servidor Node + SQLite (`server/`). Para MDX use `@mdx-js/rollup`. Não adicione bibliotecas de grafo/canvas para as constelações: são SVG feitos à mão, como no protótipo. Pergunte antes de adicionar qualquer dependência de runtime.
+Mantém: React 19, TypeScript, Vite, Tailwind 4, Zustand, React Router, Vitest, oxlint, servidor Node + SQLite (`server/`). Não adicione bibliotecas de grafo/canvas para as constelações: são SVG feitos à mão, como no protótipo. Pergunte antes de adicionar qualquer dependência de runtime.
 
 ## Regras de trabalho
 
@@ -128,8 +128,8 @@ Ordem atual: backend primeiro (0, 1, 2), depois um front mínimo (F), depois o r
 0. **Build verde e limpeza.** `.gitignore` com `/data/`. `src/data/` (nunca commitado) **não** é recriado: as telas antigas (roadmap, tópico, sinais, onboarding) e a camada de progresso antiga são apagadas. Ficam lab de grafos, algoritmos, simulação, player e Two Pointers (visualizador em `src/visualizers/twoPointers/`, conteúdo em `src/content/topics/`, guias em `src/features/node/legacy/`). Pacote renomeado para `engineering-computer-tree-skills`.
 1. **Domínio e catálogo.** Tipos, `build-catalog.ts`, validação, derivação de estado em `src/domain/tree/` (`src/domain/{types,graph}.ts` é o domínio do lab de grafos e fica onde está). Porte os cenários de `docs/db/test_schema.py` para Vitest. Conteúdo: `fund/_area.yaml`, `fund/padroes/_branch.yaml` e os nós da branch.
 2. **Banco.** Novo arquivo `data/skill-tree.db`, migration a partir de `docs/db/schema.sql` (com os desvios acima), seed do catálogo, rotas para ler catálogo + estado e gravar eventos. O progresso antigo (`data/study.db`) não é migrado: o boot avisa e deixa o arquivo intacto.
-F. **Front mínimo.** Rotas `/`, `/a/:area`, `/a/:area/:branch`, `/n/:slug` funcionando sobre a API, sem design system.
+F. **Frontend (F1–F5), escopo Fundamentos / Padrões.** Fundação visual, céu e carrossel, constelação, página do nó, acabamento — fiel a `docs/design-system/` e ao protótipo, sobre a API. Céu e carrossel mostram as 10 áreas e as 8 branches de Fundamentos (só metadados); uma orbe sem branches não abre.
 3. **Design system no código.** Tokens, fontes, céu de estrelas de fundo, componentes base (`Button`, `StatePill`, pips, `StarNode`).
 4. **Telas de navegação.** Céu, carrossel, constelação + painel, rotas e transições.
-5. **Página do nó.** Guias, gaveta Domínio com critérios por nível, Two Pointers migrado para MDX com o visualizador no novo estilo.
+5. **Página do nó.** Guias (corpo em TS), gaveta Domínio com critérios por nível, Two Pointers com o visualizador no novo estilo.
 6. **Migração de conteúdo.** As outras áreas e branches de `docs/catalogo.md`. Tópicos de `src/content/roadmap.ts` viram nós `planejado` nas branches de Fundamentos; algoritmos do lab de grafos viram nós com visualizador (e `src/domain/{types,graph}.ts` vai junto para `src/visualizers/`); o roadmap vira a trilha "Live coding" (`content/_trilhas/`). Remova o lab só depois disso.

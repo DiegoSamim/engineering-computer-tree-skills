@@ -1,0 +1,7 @@
+slug: ordenacao
+title: Ordenação
+home: fund/padroes
+kind: padrao
+content: planejado
+summary: Ordenar como transformação do problema, não só como pré-processamento.
+place: { role: lateral, x: 0.24, y: 0.86 }

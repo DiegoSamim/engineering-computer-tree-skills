@@ -1,0 +1,9 @@
+slug: binary-search
+title: Binary Search
+home: fund/padroes
+kind: padrao
+content: planejado
+summary: Descartar metade do espaço de busca a cada comparação.
+place: { role: tronco, x: 0.32, y: 0.52 }
+requires:
+  - { node: ordenacao }

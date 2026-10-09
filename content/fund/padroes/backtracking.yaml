@@ -1,0 +1,7 @@
+slug: backtracking
+title: Backtracking
+home: fund/padroes
+kind: padrao
+content: planejado
+summary: Modelar estado, escolhas, restrições e desfazer — a árvore de decisões com poda.
+place: { role: tronco, x: 0.56, y: 0.24 }

@@ -1,0 +1,9 @@
+slug: intervalos
+title: Intervalos
+home: fund/padroes
+kind: padrao
+content: planejado
+summary: Ordenar por início e varrer mesclando, cortando ou contando sobreposições.
+place: { role: lateral, x: 0.08, y: 0.64 }
+requires:
+  - { node: ordenacao, min_level: 2 }
