@@ -36,6 +36,7 @@ Em caso de conflito: este arquivo > `docs/db/schema.sql` > design system > prot�
 - **Slugs são permanentes.** O progresso depende deles. Renomear exige tabela de apelidos; evite.
 - **Nó sem critérios não evolui.** Sem `node_criterion`, o nível fica em 0 e o nó só pode ser iniciado (`estudando`). Se o nó tem critérios, todo nível de 1 a `max_level` precisa de pelo menos um.
 - **XP**: `criterio_marcado` +10, `criterio_desmarcado` −10, demais eventos 0 (`xpFor` em `src/domain/tree`). Marcar o que já está marcado não grava evento.
+- **Exercício resolvido é definitivo**: não existe evento para desfazer (`exercicio_resolvido` só grava uma vez). O check fica marcado e desabilitado.
 
 ### Desvios de `docs/db/schema.sql` (decididos)
 
@@ -123,12 +124,12 @@ Mantém: React 19, TypeScript, Vite, Tailwind 4, Zustand, React Router, Vitest, 
 
 ## Fases
 
-Ordem atual: backend primeiro (0, 1, 2), depois um front mínimo (F), depois o resto (3 a 6). Plano detalhado: conversa de 2026-10-09.
+Ordem seguida: backend (0, 1, 2), depois o frontend no escopo Fundamentos / Padrões (F). Próximo: Fase 6 (conteúdo).
 
 0. **Build verde e limpeza.** `.gitignore` com `/data/`. `src/data/` (nunca commitado) **não** é recriado: as telas antigas (roadmap, tópico, sinais, onboarding) e a camada de progresso antiga são apagadas. Ficam lab de grafos, algoritmos, simulação, player e Two Pointers (visualizador em `src/visualizers/twoPointers/`, conteúdo em `src/content/topics/`, guias em `src/features/node/legacy/`). Pacote renomeado para `engineering-computer-tree-skills`.
 1. **Domínio e catálogo.** Tipos, `build-catalog.ts`, validação, derivação de estado em `src/domain/tree/` (`src/domain/{types,graph}.ts` é o domínio do lab de grafos e fica onde está). Porte os cenários de `docs/db/test_schema.py` para Vitest. Conteúdo: `fund/_area.yaml`, `fund/padroes/_branch.yaml` e os nós da branch.
 2. **Banco.** Novo arquivo `data/skill-tree.db`, migration a partir de `docs/db/schema.sql` (com os desvios acima), seed do catálogo, rotas para ler catálogo + estado e gravar eventos. O progresso antigo (`data/study.db`) não é migrado: o boot avisa e deixa o arquivo intacto.
-F. **Frontend (F1–F5), escopo Fundamentos / Padrões.** Fundação visual, céu e carrossel, constelação, página do nó, acabamento — fiel a `docs/design-system/` e ao protótipo, sobre a API. Céu e carrossel mostram as 10 áreas e as 8 branches de Fundamentos (só metadados); uma orbe sem branches não abre.
+F. **Frontend (F1–F5), escopo Fundamentos / Padrões — feito.** Céu, carrossel, constelação + painel, página do nó com as 12 guias, visualizador e gaveta Domínio, sobre a API. Céu e carrossel mostram as 10 áreas e as 8 branches de Fundamentos (só metadados); uma orbe sem branches não abre. Peças do design system em `src/ui/`, telas em `src/features/{sky,area,branch,node}/`, CSS por componente em `src/styles/`, dados de tela em `src/store/views.ts` (funções puras, com testes). Isto cobre o que as fases 3, 4 e 5 pediam para esse escopo; o que sobra delas entra junto com a Fase 6.
 3. **Design system no código.** Tokens, fontes, céu de estrelas de fundo, componentes base (`Button`, `StatePill`, pips, `StarNode`).
 4. **Telas de navegação.** Céu, carrossel, constelação + painel, rotas e transições.
 5. **Página do nó.** Guias (corpo em TS), gaveta Domínio com critérios por nível, Two Pointers com o visualizador no novo estilo.

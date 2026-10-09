@@ -48,6 +48,11 @@
       filter var(--t-slow) var(--ease),
       background var(--t-med);
   }
+  .bcard:focus-visible {
+    outline: 1px solid color-mix(in srgb, var(--c) 40%, transparent);
+    outline-offset: -1px;
+    border-radius: 14px;
+  }
   .bcard.near {
     opacity: 0.55;
   }

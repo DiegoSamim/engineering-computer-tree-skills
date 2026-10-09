@@ -2,7 +2,18 @@
 
 Um mapa de estudos de computação em forma de árvore de habilidades. **Áreas** contêm **branches**; branches contêm **nós**; cada nó é uma sessão de estudo. Nós têm requisitos entre si (inclusive entre áreas) e acendem conforme você estuda.
 
-> **Em refatoração.** O projeto está deixando de ser um roadmap de live coding. O backend novo (domínio, catálogo, banco e API) está pronto; as telas da árvore vêm a seguir. Por enquanto, só o laboratório de grafos (`/lab/grafos`) está no ar. Decisões e fases: [`CLAUDE.md`](CLAUDE.md).
+> **Em refatoração.** O projeto deixou de ser um roadmap de live coding. Backend (domínio, catálogo, banco, API) e telas estão prontos para o primeiro escopo de conteúdo: **Fundamentos / Padrões de resolução**, com Two Pointers completo. O laboratório de grafos continua em `/lab/grafos` até virar visualizador de nós. Decisões e fases: [`CLAUDE.md`](CLAUDE.md).
+
+## Telas
+
+| Rota | Tela |
+|---|---|
+| `/` | Céu: as 10 áreas em volta de "Computação" (lista no celular) |
+| `/a/:area` | Carrossel de branches com a constelação de cada uma em miniatura |
+| `/a/:area/:branch` | Constelação expandida e o painel do nó selecionado |
+| `/n/:slug#guia` | Página do nó: uma guia por vez, visualizador, gaveta Domínio com os critérios |
+
+Teclado: Enter seleciona e abre, Esc sobe um nível, ← → no carrossel e entre guias. O visual segue o design system "Constelação" (`docs/design-system/`).
 
 ## Executar localmente
 
@@ -40,7 +51,10 @@ Hoje o conteúdo cobre as 10 áreas e as 8 branches de Fundamentos (só metadado
 - `content/`, `scripts/build-catalog.ts`: o catálogo.
 - `server/`: API local e SQLite. Veja [`server/README.md`](server/README.md).
 - `src/algorithms/`, `src/simulation/`, `src/player/`: motor das visualizações passo a passo (BFS, DFS, A*...).
-- `src/visualizers/`: visualizadores de nós (Two Pointers).
+- `src/ui/`: peças do design system (estrela, constelação, orbe, carta, pílula, pips, gaveta...).
+- `src/features/{sky,area,branch,node}/`: as quatro telas; `src/store/views.ts` monta o que elas desenham.
+- `src/styles/`: CSS por componente, só com os tokens de `src/index.css`.
+- `src/visualizers/`: visualizadores de nós, num registry por chave (Two Pointers).
 - `docs/`: catálogo planejado, esquema do banco, design system "Constelação" e protótipo de referência.
 
 O roadmap original de entrevistas está em [`Roadmap_Live_Coding_Entrevistas.md`](Roadmap_Live_Coding_Entrevistas.md) e vai virar a trilha "Live coding".
