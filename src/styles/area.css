@@ -1,0 +1,150 @@
+/* Área: carrossel de branches (BranchCard). */
+
+@layer components {
+  .area-head {
+    text-align: center;
+    padding: 8px 16px 0;
+  }
+  .area-head .eyebrow {
+    color: var(--c);
+  }
+  .area-head p {
+    margin: 6px 0 0;
+    color: var(--color-ink-faint);
+    font-size: 13px;
+  }
+
+  .carousel {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+    touch-action: pan-y;
+    padding-block: 12px;
+  }
+  .track {
+    display: flex;
+    gap: var(--gap);
+    transition: transform var(--t-slow) var(--ease);
+    will-change: transform;
+  }
+  .bcard {
+    flex: 0 0 var(--w);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 16px 20px;
+    border-radius: 14px;
+    text-align: center;
+    transform: scale(0.78);
+    opacity: 0.38;
+    filter: saturate(0.6);
+    transition:
+      transform var(--t-slow) var(--ease),
+      opacity var(--t-slow) var(--ease),
+      filter var(--t-slow) var(--ease),
+      background var(--t-med);
+  }
+  .bcard.near {
+    opacity: 0.55;
+  }
+  .bcard.on {
+    transform: scale(1);
+    opacity: 1;
+    filter: none;
+    background: radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--c) 7%, transparent), transparent 70%);
+  }
+  .bcard .constellation {
+    aspect-ratio: 600 / 520;
+  }
+  .bcard .bname {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: 20px;
+    line-height: 1.25;
+    color: var(--color-ink);
+    text-wrap: balance;
+  }
+  .bcard.on .bname {
+    color: var(--c);
+  }
+  .bcard .bcount {
+    font-size: 12px;
+    color: var(--color-ink-faint);
+  }
+  .bcard .bcount b {
+    color: var(--color-ink);
+    font-weight: 500;
+  }
+  .bcard .open {
+    margin-top: 2px;
+    font-size: 12px;
+    color: var(--c);
+    letter-spacing: 0.08em;
+    opacity: 0;
+    transition: opacity var(--t-med);
+  }
+  .bcard.on .open {
+    opacity: 1;
+  }
+
+  .pager {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    padding: 4px 16px 28px;
+    color: var(--color-ink-faint);
+  }
+  .pager button {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    color: var(--color-ink-muted);
+    transition:
+      color var(--t-fast),
+      background var(--t-fast);
+  }
+  .pager button:hover {
+    color: var(--c);
+    background: var(--soft);
+  }
+  .pager button:disabled {
+    opacity: 0.35;
+    cursor: default;
+    background: none;
+    color: var(--color-ink-muted);
+  }
+  .pager button svg {
+    width: 22px;
+    height: 22px;
+  }
+  .dots {
+    display: flex;
+    gap: 6px;
+  }
+  .dots button {
+    width: 12px;
+    height: 12px;
+    display: grid;
+    place-items: center;
+  }
+  .dots i {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-line-strong);
+    transition:
+      background var(--t-med),
+      transform var(--t-med);
+  }
+  .dots .on i {
+    background: var(--c);
+    transform: scale(1.4);
+  }
+}

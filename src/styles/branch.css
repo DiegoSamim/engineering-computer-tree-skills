@@ -1,0 +1,167 @@
+/* Constelação expandida + painel do nó selecionado. */
+
+@layer components {
+  .branch {
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    min-height: 0;
+  }
+  .sky-panel {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 4px 24px 20px;
+  }
+  .branch-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .branch-head h1 {
+    margin: 4px 0 0;
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: clamp(24px, 3vw, 34px);
+    line-height: 1.15;
+    color: var(--c);
+    text-wrap: balance;
+  }
+  .branch-head .stat {
+    font-size: 13px;
+    color: var(--color-ink-faint);
+    text-align: right;
+    line-height: 1.4;
+  }
+  .branch-head .stat b {
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--color-ink);
+    font-family: var(--font-display);
+  }
+  .big-sky {
+    flex: 1;
+    min-height: 340px;
+    display: grid;
+    place-items: center;
+  }
+  .big-sky .constellation {
+    max-height: calc(100vh - 230px);
+  }
+  .empty-sky {
+    color: var(--color-ink-faint);
+    text-align: center;
+    max-width: 34ch;
+    font-size: 14px;
+  }
+
+  .panel {
+    border-left: 1px solid var(--color-line);
+    background: color-mix(in srgb, var(--color-bg-raised) 88%, transparent);
+    padding: 22px 22px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    min-width: 0;
+    overflow-y: auto;
+  }
+  .panel .hint {
+    margin: 0;
+    color: var(--color-ink-faint);
+    font-size: 13.5px;
+  }
+  .panel h2 {
+    margin: 12px 0 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 1.25;
+  }
+  .panel .home {
+    font-size: 12px;
+    color: var(--color-ink-faint);
+    margin-top: 4px;
+  }
+  .panel .home i {
+    font-style: normal;
+    color: var(--home);
+  }
+  .panel p {
+    margin: 0;
+    color: var(--color-ink-muted);
+    font-size: 14px;
+  }
+  .panel h3 {
+    margin: 0 0 8px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ink-faint);
+  }
+  .panel .actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .reqs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13.5px;
+  }
+  .reqs li {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    color: var(--color-ink-muted);
+  }
+  .reqs .ok {
+    color: var(--c);
+  }
+  .reqs .no {
+    color: var(--color-ink-faint);
+  }
+  .reqs .note {
+    color: var(--color-ink-faint);
+    font-size: 12px;
+  }
+  .reqs .other-area {
+    color: var(--ac);
+    font-size: 12px;
+  }
+  .reqs li small {
+    color: var(--color-ink-faint);
+    margin-left: auto;
+    white-space: nowrap;
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+  .reqs .or {
+    font-size: 11px;
+    color: var(--color-ink-faint);
+    padding-left: 22px;
+    letter-spacing: 0.1em;
+  }
+}
+
+@media (max-width: 900px) {
+  .branch {
+    grid-template-columns: 1fr;
+  }
+  .panel {
+    border-left: 0;
+    border-top: 1px solid var(--color-line);
+  }
+}
+@media (max-width: 640px) {
+  .sky-panel {
+    padding-inline: 16px;
+  }
+}

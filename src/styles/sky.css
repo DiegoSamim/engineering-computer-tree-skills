@@ -1,0 +1,247 @@
+/* Céu: 10 orbes de área em volta de "Computação" (AreaOrb). */
+
+@layer components {
+  .sky {
+    flex: 1;
+    display: grid;
+    place-items: center;
+    padding: 8px 16px 32px;
+  }
+  .sky-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+  .stage {
+    position: relative;
+    width: min(92vw, calc(100vh - 150px), 780px);
+    aspect-ratio: 1;
+  }
+  .stage > svg.links {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .links .ring {
+    fill: none;
+    stroke: var(--color-line);
+    stroke-width: 1;
+  }
+  .links .spoke {
+    stroke: var(--sc);
+    stroke-width: 1;
+    opacity: 0.45;
+    transition: opacity var(--t-med) var(--ease);
+  }
+  .links .spoke.on {
+    opacity: 1;
+  }
+
+  .core {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 23%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    border: 1px solid var(--color-line-strong);
+    box-shadow:
+      0 0 0 10px var(--color-bg),
+      0 0 0 11px var(--color-line);
+    background: var(--color-bg);
+  }
+  .core .name {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: clamp(14px, 2.2vw, 19px);
+    color: var(--color-ink);
+  }
+  .core .count {
+    font-size: 11px;
+    color: var(--color-ink-faint);
+    margin-top: 2px;
+  }
+
+  .orb {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: 12.5%;
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    animation: orb-in var(--t-slow) var(--ease) both;
+    animation-delay: calc(var(--i) * 45ms + 120ms);
+  }
+  @keyframes orb-in {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.6);
+    }
+  }
+  .orb .disc {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1.5px solid var(--c);
+    background: var(--color-bg);
+    box-shadow:
+      0 0 22px var(--glow),
+      inset 0 0 14px color-mix(in srgb, var(--c) 10%, transparent);
+    transition:
+      box-shadow var(--t-med) var(--ease),
+      transform var(--t-med) var(--ease);
+  }
+  .orb .halo {
+    position: absolute;
+    inset: -14%;
+    border-radius: 50%;
+    border: 1px solid color-mix(in srgb, var(--c) 22%, transparent);
+  }
+  .orb svg.arc {
+    position: absolute;
+    inset: -14%;
+    width: 128%;
+    height: 128%;
+    transform: rotate(-90deg);
+  }
+  .orb svg.arc circle {
+    fill: none;
+    stroke: var(--c);
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+  .orb .icon {
+    position: relative;
+    width: 42%;
+    height: 42%;
+    color: var(--c);
+  }
+  .orb .label {
+    position: absolute;
+    top: calc(100% + 18%);
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: clamp(11px, 1.45vw, 13.5px);
+    color: var(--color-ink);
+    text-align: center;
+    line-height: 1.3;
+  }
+  .orb .label small {
+    display: block;
+    color: var(--color-ink-faint);
+    font-size: 0.85em;
+  }
+  .orb.open {
+    cursor: pointer;
+  }
+  .orb.open:hover .disc,
+  .orb.open:focus-visible .disc {
+    box-shadow:
+      0 0 40px color-mix(in srgb, var(--c) 45%, transparent),
+      inset 0 0 18px color-mix(in srgb, var(--c) 18%, transparent);
+    transform: scale(1.06);
+  }
+  .orb:not(.open) {
+    cursor: default;
+  }
+
+  /* Orbe clicada viaja para o centro e cresce; o resto some. */
+  .stage.zoom .orb:not(.picked),
+  .stage.zoom .core,
+  .stage.zoom svg.links {
+    opacity: 0;
+    transition: opacity var(--t-med) var(--ease);
+  }
+  .stage.zoom .orb.picked {
+    transition:
+      transform var(--t-med) var(--ease),
+      left var(--t-med) var(--ease),
+      top var(--t-med) var(--ease);
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) scale(2.2);
+  }
+
+  .sky-hint {
+    margin-top: 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: var(--color-ink-faint);
+    font-size: 12.5px;
+    letter-spacing: 0.12em;
+  }
+  .sky-hint::before,
+  .sky-hint::after {
+    content: '';
+    width: 64px;
+    height: 1px;
+    background: var(--color-line-strong);
+  }
+
+  .area-list {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .stage,
+  .sky-hint {
+    display: none;
+  }
+  .sky {
+    place-items: start stretch;
+  }
+  .area-list {
+    display: grid;
+    gap: 4px;
+    width: 100%;
+  }
+  .area-row {
+    display: grid;
+    grid-template-columns: 46px 1fr auto;
+    gap: 14px;
+    align-items: center;
+    padding: 10px 6px;
+    border-radius: 10px;
+    text-align: left;
+  }
+  .area-row.open:hover {
+    background: var(--color-bg-raised);
+  }
+  .area-row .ic {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    border: 1.5px solid var(--c);
+    color: var(--c);
+    box-shadow: 0 0 14px var(--glow);
+  }
+  .area-row .ic svg {
+    width: 22px;
+    height: 22px;
+  }
+  .area-row b {
+    display: block;
+    font-weight: 500;
+  }
+  .area-row small {
+    color: var(--color-ink-faint);
+    font-size: 13px;
+  }
+  .area-row .mono {
+    font-size: 12px;
+    color: var(--color-ink-faint);
+  }
+}

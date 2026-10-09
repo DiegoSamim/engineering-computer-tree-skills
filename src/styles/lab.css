@@ -1,0 +1,23 @@
+/* Regras que o laboratório de grafos (/lab/grafos) usava do CSS antigo. */
+
+@layer components {
+  .font-mono-num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ge-node-circle {
+    transition:
+      fill 320ms ease,
+      stroke 320ms ease,
+      stroke-width 320ms ease,
+      opacity 320ms ease;
+  }
+
+  .ge-node-group {
+    cursor: default;
+  }
+  .ge-node-group[data-clickable='true'] {
+    cursor: pointer;
+  }
+}
