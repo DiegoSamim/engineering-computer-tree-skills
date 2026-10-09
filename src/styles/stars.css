@@ -1,0 +1,220 @@
+/* StarNode, linhas da constelação e legenda. Compartilhado pela miniatura do
+   carrossel e pela constelação expandida. */
+
+@layer components {
+  .constellation {
+    width: 100%;
+    overflow: visible;
+  }
+
+  .edge {
+    stroke: var(--color-ink-faint);
+    stroke-width: 1.4;
+    opacity: 0.35;
+    fill: none;
+  }
+  .edge.lit {
+    stroke: var(--c);
+    opacity: 0.85;
+    filter: drop-shadow(0 0 3px var(--glow));
+  }
+  .edge.alt {
+    stroke-dasharray: 3 6;
+  }
+  .edge.draw {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: edge-draw var(--t-slow) var(--ease) forwards;
+    animation-delay: calc(var(--i) * 40ms);
+  }
+  .edge.alt.draw {
+    stroke-dasharray: 3 6;
+    stroke-dashoffset: 0;
+    animation: edge-fade var(--t-slow) var(--ease) both;
+  }
+  @keyframes edge-draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes edge-fade {
+    from {
+      opacity: 0;
+    }
+  }
+
+  .star .base {
+    fill: var(--color-bg);
+  }
+  .star .ring {
+    fill: none;
+    stroke: var(--c);
+    stroke-width: 1.6;
+  }
+  .star.bloqueado .ring {
+    stroke: var(--color-ink-faint);
+    opacity: 0.7;
+  }
+  .star.disponivel .ring {
+    opacity: 0.8;
+  }
+  .star .fill {
+    fill: var(--c);
+  }
+  .star .halo {
+    fill: var(--c);
+    opacity: 0.16;
+  }
+  .star .prog {
+    fill: none;
+    stroke: var(--c);
+    stroke-width: 2.2;
+    stroke-linecap: round;
+  }
+  .star .mirror {
+    fill: none;
+    stroke: var(--home);
+    stroke-width: 1.2;
+    stroke-dasharray: 1.5 3.5;
+  }
+  .star.planejado .ring {
+    stroke-dasharray: 2.5 3;
+  }
+  .star.dominado .halo {
+    animation: twinkle 4.2s ease-in-out infinite;
+    animation-delay: calc(var(--i) * -0.7s);
+  }
+  @keyframes twinkle {
+    0%,
+    100% {
+      opacity: 0.12;
+    }
+    50% {
+      opacity: 0.3;
+    }
+  }
+  .star.estudando .pulse {
+    fill: none;
+    stroke: var(--c);
+    stroke-width: 1;
+    animation: pulse 2.4s var(--ease) infinite;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  @keyframes pulse {
+    from {
+      opacity: 0.7;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(2.1);
+    }
+  }
+  .star .lbl {
+    fill: var(--color-ink-muted);
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    paint-order: stroke;
+    stroke: var(--color-bg);
+    stroke-width: 5px;
+    stroke-linejoin: round;
+    transition: fill var(--t-fast);
+  }
+  .star.bloqueado .lbl {
+    fill: var(--color-ink-faint);
+  }
+  .star .tag {
+    fill: var(--home);
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    paint-order: stroke;
+    stroke: var(--color-bg);
+    stroke-width: 4px;
+  }
+
+  /* Interação: só na constelação expandida. */
+  .constellation.big .star {
+    cursor: pointer;
+    outline: none;
+  }
+  .constellation.big .star:hover .lbl,
+  .constellation.big .star:focus-visible .lbl,
+  .constellation.big .star.sel .lbl {
+    fill: var(--color-ink);
+  }
+  .constellation.big .star .hit {
+    fill: transparent;
+  }
+  .constellation.big .star.sel .ring {
+    stroke-width: 2.4;
+  }
+  .constellation.big .star .selring {
+    fill: none;
+    stroke: var(--c);
+    stroke-width: 1;
+    opacity: 0;
+    transition: opacity var(--t-med);
+  }
+  .constellation.big .star.sel .selring,
+  .constellation.big .star:focus-visible .selring {
+    opacity: 0.55;
+  }
+  .constellation.focus .edge {
+    opacity: 0.12;
+  }
+  .constellation.focus .edge.rel {
+    opacity: 0.95;
+  }
+
+  .empty-stars circle {
+    fill: none;
+    stroke: var(--color-ink-faint);
+    stroke-dasharray: 2 3;
+    opacity: 0.6;
+  }
+
+  /* ── Legenda ──────────────────────────────────────────────────────── */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    font-size: 12px;
+    color: var(--color-ink-faint);
+    padding-top: 6px;
+  }
+  .legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .legend svg {
+    width: 18px;
+    height: 18px;
+  }
+  .legend .l-fill {
+    fill: var(--c);
+  }
+  .legend .l-ring {
+    fill: none;
+    stroke: var(--c);
+    stroke-width: 1.4;
+  }
+  .legend .l-off {
+    fill: none;
+    stroke: var(--color-ink-faint);
+    stroke-width: 1.4;
+  }
+  .legend .l-dash {
+    stroke-dasharray: 2 2;
+  }
+  .legend .l-mirror {
+    fill: none;
+    stroke: var(--color-area-sistemas);
+    stroke-dasharray: 1 2;
+  }
+  .legend .l-alt {
+    stroke: var(--c);
+    stroke-dasharray: 3 3;
+  }
+}

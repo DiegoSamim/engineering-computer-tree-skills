@@ -1,0 +1,30 @@
+slug: condicionais
+title: "Condicionais"
+home: fund/logica
+kind: conceito
+content: planejado
+max_level: 3
+est_minutes: 45
+summary: "Como o programa escolhe um caminho: if, else, encadeamentos e casos de borda."
+place: { role: tronco, x: 0.64, y: 0.46 }
+requires:
+  - { node: logica-booleana }
+levels:
+  - level: 1
+    name: Entendi
+    criteria:
+      - id: if-else-encadeado
+        label: "Estrutura"
+        text: "Usar if/else e condicionais encadeadas."
+  - level: 2
+    name: Pratiquei
+    criteria:
+      - id: todos-os-casos
+        label: "Cobertura"
+        text: "Cobrir todos os casos, inclusive os de borda, usando retorno antecipado quando simplifica."
+  - level: 3
+    name: Dominei
+    criteria:
+      - id: achatar-aninhados
+        label: "Refatoração"
+        text: "Achatar ifs aninhados sem mudar o comportamento."

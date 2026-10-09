@@ -1,0 +1,30 @@
+slug: lacos
+title: "Laços de repetição"
+home: fund/logica
+kind: conceito
+content: planejado
+max_level: 3
+est_minutes: 60
+summary: "Repetir até uma condição: for e while, contadores, acumuladores e condição de parada."
+place: { role: tronco, x: 0.36, y: 0.34 }
+requires:
+  - { node: condicionais }
+levels:
+  - level: 1
+    name: Entendi
+    criteria:
+      - id: contador-acumulador
+        label: "Estrutura"
+        text: "Usar for e while com contador e acumulador."
+  - level: 2
+    name: Pratiquei
+    criteria:
+      - id: condicao-de-parada
+        label: "Parada"
+        text: "Definir a condição de parada sem off-by-one nem laço infinito."
+  - level: 3
+    name: Dominei
+    criteria:
+      - id: aninhados-sentinela
+        label: "Domínio"
+        text: "Usar laços aninhados e flag/sentinela, prevendo quantas iterações acontecem."

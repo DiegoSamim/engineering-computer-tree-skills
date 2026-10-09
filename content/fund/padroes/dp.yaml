@@ -1,0 +1,10 @@
+slug: dp
+title: Programação dinâmica
+home: fund/padroes
+kind: padrao
+content: planejado
+summary: Estado, transição e base — nessa ordem.
+place: { role: tronco, x: 0.4, y: 0.06 }
+requires:
+  - { node: backtracking }
+  - { node: recursao, min_level: 2 }

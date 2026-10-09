@@ -1,0 +1,245 @@
+/* Constelação expandida + painel do nó selecionado. */
+
+@layer components {
+  .branch {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .sky-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    padding: 4px 24px 20px;
+  }
+  .branch-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    transition: padding var(--t-slow) var(--ease);
+  }
+  .branch-head h1 {
+    margin: 4px 0 0;
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: clamp(24px, 3vw, 34px);
+    line-height: 1.15;
+    color: var(--c);
+    text-wrap: balance;
+  }
+  .branch-head .stat {
+    margin-left: auto;
+    font-size: 13px;
+    color: var(--color-ink-faint);
+    text-align: right;
+    line-height: 1.4;
+  }
+  .branch-head .stat b {
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--color-ink);
+    font-family: var(--font-display);
+  }
+
+  /* Câmera: a cena (o SVG) é transformada em perspectiva para aproximar a
+     estrela selecionada, como no Skyrim. O céu recorta o que sobra. */
+  .big-sky {
+    position: relative;
+    flex: 1;
+    min-height: 340px;
+    perspective: 1100px;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+  }
+  /* O zoom é do viewBox (src/ui/Constellation.tsx). A inclinação em
+     perspectiva é animada pela tela durante o movimento, em volta do ponto
+     onde a estrela para, e volta a zero: parada, a cena fica plana e nítida. */
+  .scene {
+    position: absolute;
+    inset: 0;
+    transform-origin: var(--ox, 50%) var(--oy, 50%);
+  }
+  .scene .constellation {
+    width: 100%;
+    height: 100%;
+  }
+  .branch.has-sel .constellation .star:not(.sel) {
+    opacity: 0.55;
+    transition: opacity var(--t-med);
+  }
+  .empty-sky {
+    color: var(--color-ink-faint);
+    text-align: center;
+    max-width: 34ch;
+    font-size: 14px;
+  }
+  .sky-foot {
+    transition: padding var(--t-slow) var(--ease);
+  }
+  .pick-hint {
+    margin: 0 0 6px;
+    color: var(--color-ink-faint);
+    font-size: 13px;
+  }
+
+  /* Painel: entra deslizando quando uma estrela é selecionada. */
+  .panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 5;
+    width: 340px;
+    border-left: 1px solid var(--color-line);
+    background: color-mix(in srgb, var(--color-bg-raised) 92%, transparent);
+    padding: 22px 22px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    min-width: 0;
+    overflow-y: auto;
+    transform: translateX(100%);
+    visibility: hidden;
+    transition:
+      transform var(--t-slow) var(--ease),
+      visibility 0s linear var(--t-slow);
+  }
+  .panel.on {
+    transform: none;
+    visibility: visible;
+    transition: transform var(--t-slow) var(--ease);
+  }
+  .branch.has-sel .branch-head,
+  .branch.has-sel .sky-foot {
+    padding-right: 340px;
+  }
+  .panel-close {
+    position: absolute;
+    right: 14px;
+    top: 14px;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-md);
+    color: var(--color-ink-faint);
+    font-size: 20px;
+    line-height: 1;
+  }
+  .panel-close:hover {
+    color: var(--color-ink);
+    background: var(--color-bg-panel);
+  }
+  .panel .hint {
+    margin: 0;
+    color: var(--color-ink-faint);
+    font-size: 13.5px;
+  }
+  .panel h2 {
+    margin: 12px 0 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 1.25;
+  }
+  .panel .home {
+    font-size: 12px;
+    color: var(--color-ink-faint);
+    margin-top: 4px;
+  }
+  .panel .home i {
+    font-style: normal;
+    color: var(--home);
+  }
+  .panel p {
+    margin: 0;
+    color: var(--color-ink-muted);
+    font-size: 14px;
+  }
+  .panel h3 {
+    margin: 0 0 8px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ink-faint);
+  }
+  .panel .actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .reqs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13.5px;
+  }
+  .reqs li {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    color: var(--color-ink-muted);
+  }
+  .reqs .ok {
+    color: var(--c);
+  }
+  .reqs .no {
+    color: var(--color-ink-faint);
+  }
+  .reqs .note {
+    color: var(--color-ink-faint);
+    font-size: 12px;
+  }
+  .reqs .other-area {
+    color: var(--ac);
+    font-size: 12px;
+  }
+  .reqs li small {
+    color: var(--color-ink-faint);
+    margin-left: auto;
+    white-space: nowrap;
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+  .reqs .or {
+    font-size: 11px;
+    color: var(--color-ink-faint);
+    padding-left: 22px;
+    letter-spacing: 0.1em;
+  }
+
+  @media (max-width: 900px) {
+    /* No celular o painel é uma folha que sobe por baixo. */
+    .panel {
+      position: fixed;
+      top: auto;
+      left: 0;
+      width: auto;
+      max-height: 58vh;
+      border-left: 0;
+      border-top: 1px solid var(--color-line);
+      border-radius: 16px 16px 0 0;
+      transform: translateY(100%);
+    }
+    .branch.has-sel .branch-head,
+    .branch.has-sel .sky-foot {
+      padding-right: 0;
+    }
+  }
+  @media (max-width: 640px) {
+    .sky-panel {
+      padding-inline: 16px;
+    }
+  }
+}

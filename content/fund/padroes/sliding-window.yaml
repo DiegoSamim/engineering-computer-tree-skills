@@ -1,0 +1,11 @@
+slug: sliding-window
+title: Sliding Window
+home: fund/padroes
+kind: padrao
+content: planejado
+summary: Janela fixa ou variável que expande, valida e contrai.
+place: { role: tronco, x: 0.64, y: 0.48 }
+requires:
+  - { node: two-pointers, min_level: 2 }
+related:
+  - { node: two-pointers, type: compara_com }

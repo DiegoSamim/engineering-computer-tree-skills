@@ -1,0 +1,30 @@
+slug: pseudocodigo
+title: "Pseudocódigo e fluxogramas"
+home: fund/logica
+kind: conceito
+content: planejado
+max_level: 3
+est_minutes: 30
+summary: "Descrever um algoritmo sem depender de linguagem, em texto estruturado ou em diagrama."
+place: { role: lateral, x: 0.86, y: 0.9 }
+requires:
+  - { node: algoritmos }
+levels:
+  - level: 1
+    name: Entendi
+    criteria:
+      - id: ler-fluxograma
+        label: "Leitura"
+        text: "Ler um fluxograma e dizer o que ele calcula."
+  - level: 2
+    name: Pratiquei
+    criteria:
+      - id: escrever-pseudocodigo
+        label: "Escrita"
+        text: "Escrever pseudocódigo com decisão e repetição."
+  - level: 3
+    name: Dominei
+    criteria:
+      - id: traduzir-para-codigo
+        label: "Tradução"
+        text: "Traduzir o próprio pseudocódigo para código sem mudar a lógica."

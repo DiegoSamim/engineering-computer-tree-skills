@@ -1,10 +1,21 @@
-import { SCHEMA_VERSION } from '../src/data/types.ts';
-import { createRouter, readJson, sendError, sendJson, type Route } from './http.ts';
-import { SqliteProgressStore, UnknownTopicError } from './store.ts';
-import { validateEvent, validateImport } from './validate.ts';
+import type { EventResponse } from '../src/domain/tree/api.ts';
+import { indexCatalog } from '../src/domain/tree/catalogIndex.ts';
+import { readCatalog } from './catalog/read.ts';
+import type { Db } from './db.ts';
+import { createRouter, readJson, sendError, sendJson, type Handler, type Route } from './http.ts';
+import { validateEvent, validateImport, validateProfile } from './progress/events.ts';
+import { readState } from './progress/state.ts';
+import { ProgressStore } from './progress/store.ts';
 
-export function createRoutes(store: SqliteProgressStore) {
+/**
+ * API da skill tree. O catálogo é lido do banco uma vez (ele só muda no boot,
+ * com o seed); o estado é lido a cada pedido, das views.
+ */
+export function createRoutes(db: Db, store = new ProgressStore(db)): Handler {
   const startedAt = Date.now();
+  const catalog = readCatalog(db);
+  const index = indexCatalog(catalog);
+  const state = () => readState(db, index);
 
   const routes: Route[] = [
     {
@@ -13,41 +24,40 @@ export function createRoutes(store: SqliteProgressStore) {
       handler: (_req, res) =>
         sendJson(res, 200, {
           ok: true,
-          schemaVersion: SCHEMA_VERSION,
+          nodes: catalog.nodes.length,
           events: store.eventCount(),
           uptimeSeconds: Math.round((Date.now() - startedAt) / 1000),
         }),
     },
 
-    {
-      // O snapshot inteiro em uma chamada — é isto que faz abrir o app não
-      // exigir remarcar nada do que já foi feito.
-      method: 'GET',
-      path: '/api/progress',
-      handler: (_req, res) => sendJson(res, 200, store.load()),
-    },
+    { method: 'GET', path: '/api/catalog', handler: (_req, res) => sendJson(res, 200, catalog) },
+
+    { method: 'GET', path: '/api/state', handler: (_req, res) => sendJson(res, 200, state()) },
 
     {
       method: 'POST',
-      path: '/api/progress/events',
+      path: '/api/events',
       handler: async (req, res) => {
         const parsed = validateEvent(await readJson(req));
         if (!parsed.ok) return sendError(res, 400, parsed.error);
-
-        try {
-          return sendJson(res, 200, store.append(parsed.value));
-        } catch (error) {
-          if (error instanceof UnknownTopicError) return sendError(res, 400, error.message);
-          throw error;
-        }
+        const recorded = store.append(parsed.value);
+        const body: EventResponse = { recorded, state: state() };
+        return sendJson(res, 200, body);
       },
     },
 
     {
-      method: 'GET',
-      path: '/api/export',
-      handler: (_req, res) => sendJson(res, 200, store.exportLog()),
+      method: 'PATCH',
+      path: '/api/me',
+      handler: async (req, res) => {
+        const parsed = validateProfile(await readJson(req));
+        if (!parsed.ok) return sendError(res, 400, parsed.error);
+        store.setDisplayName(parsed.value.displayName);
+        return sendJson(res, 200, state());
+      },
     },
+
+    { method: 'GET', path: '/api/export', handler: (_req, res) => sendJson(res, 200, store.exportLog()) },
 
     {
       method: 'POST',
@@ -55,20 +65,18 @@ export function createRoutes(store: SqliteProgressStore) {
       handler: async (req, res) => {
         const parsed = validateImport(await readJson(req));
         if (!parsed.ok) return sendError(res, 400, parsed.error);
-
         const result = store.importLog(parsed.value);
-        return sendJson(res, 200, {
-          snapshot: result.snapshot,
-          imported: result.imported,
-          skipped: result.skipped,
-        });
+        return sendJson(res, 200, { ...result, state: state() });
       },
     },
 
     {
       method: 'POST',
       path: '/api/reset',
-      handler: (_req, res) => sendJson(res, 200, store.reset()),
+      handler: (_req, res) => {
+        store.reset();
+        return sendJson(res, 200, state());
+      },
     },
   ];
 

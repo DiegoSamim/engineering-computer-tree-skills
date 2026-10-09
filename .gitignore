@@ -24,7 +24,10 @@ dist-ssr
 *.sw?
 
 # Banco de dados local (gerado em runtime)
-data/
+/data/
 *.db
 *.db-wal
 *.db-shm
+
+# Catálogo gerado a partir de content/ (npm run catalog)
+src/generated/

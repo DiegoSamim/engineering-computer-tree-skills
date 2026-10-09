@@ -1,0 +1,30 @@
+slug: logica-booleana
+title: "Lógica booleana"
+home: fund/logica
+kind: conceito
+content: planejado
+max_level: 3
+est_minutes: 45
+summary: "Combinar condições com E, OU e NÃO sem errar, e simplificá-las."
+place: { role: tronco, x: 0.36, y: 0.58 }
+requires:
+  - { node: operadores }
+levels:
+  - level: 1
+    name: Entendi
+    criteria:
+      - id: tabela-verdade
+        label: "Tabela-verdade"
+        text: "Montar a tabela-verdade de E, OU e NÃO."
+  - level: 2
+    name: Pratiquei
+    criteria:
+      - id: de-morgan-curto-circuito
+        label: "Simplificação"
+        text: "Simplificar condições com De Morgan e explicar o curto-circuito."
+  - level: 3
+    name: Dominei
+    criteria:
+      - id: reescrever-condicao
+        label: "Clareza"
+        text: "Reescrever uma condição composta confusa numa equivalente legível."

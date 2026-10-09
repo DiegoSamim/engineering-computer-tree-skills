@@ -1,0 +1,30 @@
+slug: variaveis-tipos
+title: "Variáveis e tipos"
+home: fund/logica
+kind: conceito
+content: planejado
+max_level: 3
+est_minutes: 40
+summary: "Como o programa guarda e nomeia valores: atribuição, tipos primitivos e conversões."
+place: { role: tronco, x: 0.34, y: 0.82 }
+requires:
+  - { node: algoritmos }
+levels:
+  - level: 1
+    name: Entendi
+    criteria:
+      - id: variavel-atribuicao
+        label: "Conceito"
+        text: "Explicar variável, atribuição e os tipos primitivos (inteiro, real, texto, booleano)."
+  - level: 2
+    name: Pratiquei
+    criteria:
+      - id: escolher-converter
+        label: "Tipos"
+        text: "Escolher o tipo certo e converter entre tipos sem perder informação por acidente."
+  - level: 3
+    name: Dominei
+    criteria:
+      - id: prever-valores
+        label: "Previsão"
+        text: "Prever o valor de cada variável depois de uma sequência de atribuições."

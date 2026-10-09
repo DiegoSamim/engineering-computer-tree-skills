@@ -1,0 +1,9 @@
+slug: prefix-sum
+title: Prefix Sum
+home: fund/padroes
+kind: padrao
+content: planejado
+summary: Somas acumuladas para responder consultas de intervalo em O(1).
+place: { role: lateral, x: 0.9, y: 0.62 }
+requires:
+  - { node: lacos }

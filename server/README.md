@@ -1,113 +1,71 @@
-# Backend de estudo — SQLite
+# Backend da skill tree — SQLite
 
-> **Status: implementado.** Progresso, migração e export/import funcionando.
-> Revisão espaçada e error log têm tabela criada, mas ainda não têm rota nem tela.
+API local, single-user, sem dependências: `node:sqlite`, `node:http` e um roteador de poucas linhas. TypeScript roda direto com `node --experimental-strip-types`.
 
-## Zero dependências
-
-O backend inteiro usa só o que vem no Node 22:
-
-| Peça | O quê |
-|---|---|
-| Banco | `node:sqlite` (`DatabaseSync`) — sem driver nativo, sem `node-gyp` |
-| HTTP | `node:http` + um roteador de ~30 linhas em `http.ts` |
-| TypeScript | `node --experimental-strip-types` — o `tsconfig` já exige `erasableSyntaxOnly` |
-| Validação | `validate.ts`, escrito à mão |
-
-Consequência prática: nenhum `npm install` pode falhar e nada precisa ser recompilado quando a
-versão do Node muda.
-
-> **Restrição a respeitar:** strip-types não aceita sintaxe que *gere* código —
-> nada de `enum`, `namespace` ou *parameter property* (`constructor(private x)`).
-> Use campos explícitos. `erasableSyntaxOnly` no `tsconfig` pega isso no build.
-> Imports precisam de extensão explícita: `./db.ts`, não `./db`.
+> **Restrição:** strip-types não aceita sintaxe que gere código (`enum`, `namespace`, parameter properties) e exige imports com extensão (`./db.ts`). Vale também para `src/domain/tree/`, que o servidor importa.
 
 ## Como rodar
 
 ```bash
-npm run server          # só a API, porta 8787
-./scripts/start.sh      # API + Vite juntos (é o que o atalho do Windows chama)
+npm run server          # só a API, porta 8787 (gera o catálogo antes)
+./scripts/start.sh      # API + Vite
 ```
 
-Variáveis: `PORT` (8787), `HOST` (127.0.0.1), `DB_PATH` (`data/study.db`).
+Variáveis: `PORT` (8787), `HOST` (127.0.0.1), `DB_PATH` (`data/skill-tree.db`).
 
-## A regra central
+O progresso do roadmap antigo (`data/study.db`) não é migrado: o boot avisa e deixa o arquivo intacto.
 
-O servidor **não reimplementa** as regras de progresso. `store.append()` grava o fato no log e
-chama `applyProgressEvent` — a mesma função de [`src/data/reducer.ts`](../src/data/reducer.ts)
-que o navegador usa — para derivar o estado.
+## Boot
 
-Duas implementações das mesmas regras divergiriam com o tempo; uma não pode. O teste
-`server/__tests__/store.test.ts` trava isso: aplicar N eventos pelo store tem que produzir
-snapshot **idêntico** ao fold puro do reducer.
+1. Abre o banco e aplica as migrations (`migrations/001_skill_tree.sql`, vinda de `docs/db/schema.sql` com os desvios do `CLAUDE.md`; `002` acrescenta o evento `exercicio_desmarcado`).
+2. Lê `src/generated/catalog.json` e semeia o catálogo (`catalog/seed.ts`): idempotente por slug, sem trocar ids. Critérios e exercícios são atualizados por (nó, slug), porque o progresso aponta para eles. Um nó removido do conteúdo que tem progresso **impede o boot**: slugs são permanentes.
+3. Roda `catalog/validate.sql` (cópia de `docs/db/validate.sql`); qualquer erro impede o boot.
+4. `ProgressStore.rebuild()` refaz o estado materializado a partir do log, para os níveis acompanharem critérios que mudaram.
 
-## Duas camadas
+## Regras
 
-1. **`progress_event`** — log append-only, fonte da verdade, nunca sofre `UPDATE`.
-2. **Tabelas derivadas** — `topic_progress`, `mastery_check`, etc. Leitura rápida, sempre
-   reconstruíveis: `store.rebuild()` reprocessa o log inteiro.
-
-É isso que dá o "versionado": além das migrations numeradas, o histórico de *o que foi feito e
-quando* fica preservado. Bug na materialização se corrige reprocessando, sem perder dado.
+- **`progress_event` é a fonte da verdade** (só INSERT). `user_node`, `user_criterion`, `user_guide` e `user_exercise` são estado materializado e podem ser refeitos do log.
+- **O servidor não reimplementa regra.** O nível vem de `levelFromCriteria` e o XP de `xpFor`, de `src/domain/tree`. Estados e contadores vêm das views SQL, e `__tests__/schema.test.ts` prova que elas dão o mesmo resultado que a derivação em TypeScript em todos os cenários de `docs/db/test_schema.py`.
+- **Evento que não muda nada não é gravado** (marcar o que já está marcado): o log e o XP não inflam. A resposta diz `recorded: false`.
+- Referência desconhecida (nó, critério, guia, exercício) é **400** e não suja o log.
 
 ## API
 
 ```
-GET  /api/health              → { ok, schemaVersion, events, uptimeSeconds }
-GET  /api/progress            → ProgressSnapshot completo em uma chamada
-POST /api/progress/events     ← ProgressEvent → ProgressSnapshot
-GET  /api/export              → { schemaVersion, events: StoredEvent[] }
-POST /api/import              ← mesmo formato → { snapshot, imported, skipped }
-POST /api/reset               → snapshot vazio
+GET   /api/health    → { ok, nodes, events, uptimeSeconds }
+GET   /api/catalog   → Catalog (áreas, branches, nós com placements, requisitos, critérios, exercícios)
+GET   /api/state     → TreeState (estado de cada nó, contadores de branch e área, XP, totais)
+POST  /api/events    ← ProgressEventInput → { recorded, state }
+PATCH /api/me        ← { displayName } → TreeState
+GET   /api/export    → { version: 1, events }
+POST  /api/import    ← mesmo formato → { imported, skipped, state }
+POST  /api/reset     → TreeState vazio
 ```
 
-Sem CORS: o Vite faz proxy de `/api` → `127.0.0.1:8787`, então tudo é same-origin.
-Sem autenticação, escutando só em `127.0.0.1` — é single-user local.
+Eventos (`src/domain/tree/types.ts`):
 
-Eventos de tópicos fora do catálogo são recusados com **400** (`UnknownTopicError`). No
-`/api/import` eles são apenas descartados e contados em `skipped`, para que um id obsoleto não
-inviabilize a migração inteira.
+```
+{ type: 'iniciou', node }
+{ type: 'criterio_marcado' | 'criterio_desmarcado', node, criterion }
+{ type: 'guia_lida' | 'guia_desmarcada', node, guide }
+{ type: 'exercicio_tentado' | 'exercicio_resolvido' | 'exercicio_desmarcado', node, exercise }
+{ type: 'sessao_estudo', node, seconds }
+```
 
-## Ligação com o frontend
-
-| Arquivo | Papel |
-|---|---|
-| `src/data/httpRepository.ts` | Implementa `ProgressRepository` sobre `fetch`. |
-| `src/data/bootstrap.ts` | Decide local × servidor; roda a migração uma única vez. |
-| `src/data/repository.ts` | Ponto único de troca do adaptador. |
-
-Sem `VITE_API_URL`, o app roda 100% standalone no `localStorage` — o modo anterior não foi
-perdido. Com a variável (o `start.sh` define `/api`), passa a falar com o servidor.
-
-**Se o servidor estiver fora do ar, o app mostra uma falha visível e não grava no navegador.**
-Fallback silencioso criaria duas fontes de verdade divergindo sem ninguém perceber.
-
-## Migração do localStorage
-
-No primeiro boot com API disponível e banco vazio, `bootstrap.ts` envia o log local para
-`/api/import` e marca `lc.progress.migratedToServer`. Os `occurredAt` originais são preservados —
-o histórico não é achatado para "agora". Reabrir não duplica.
+Os tipos de resposta (`TreeState`, `EventResponse`...) ficam em `src/domain/tree/api.ts`, compartilhados com o front. Sem CORS: o Vite faz proxy de `/api`. Sem autenticação, escutando só em `127.0.0.1`.
 
 ## Estrutura
 
 ```
 server/
-  index.ts            bootstrap: abre o banco, migra, semeia, sobe o HTTP
-  db.ts               conexão + PRAGMA + helper de transação
-  migrations/
-    001_initial.sql   esquema inicial
-    run.ts            runner idempotente (tabela schema_migrations)
-  seed.ts             espelha src/content/roadmap.ts para section/topic
-  store.ts            SqliteProgressStore
-  validate.ts         validadores de ProgressEvent
-  http.ts             roteador mínimo
-  routes.ts           as seis rotas
+  index.ts              boot
+  db.ts                 conexão, PRAGMA, transação
+  http.ts               roteador mínimo, HttpError
+  routes.ts             as rotas
+  migrations/           001_skill_tree.sql, 002_exercicio_desmarcado.sql + runner idempotente
+  catalog/              load (JSON gerado), seed, read, validate.sql
+  progress/             events (validação de entrada), store (log + materialização), state (leitura das views)
+  __tests__/            schema × domínio, catálogo, store, rotas
 ```
 
-## Próximos passos
-
-1. `review_schedule` — repetição espaçada (SM-2) + tela de revisão.
-2. `error_log` — registro de por que errou + revisão semanal.
-3. `study_session` — tempo real de estudo por tópico.
-
-As três tabelas já existem; falta rota e tela.
+`npm run catalog -- --seed <banco>` semeia um banco sem subir a API.

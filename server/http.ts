@@ -2,6 +2,17 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 
 const MAX_BODY_BYTES = 5 * 1024 * 1024; // migrações de log podem ser grandes
 
+/** Erro com status HTTP próprio. O roteador responde com ele em vez de 500. */
+export class HttpError extends Error {
+  readonly status: number;
+
+  constructor(status: number, message: string) {
+    super(message);
+    this.name = 'HttpError';
+    this.status = status;
+  }
+}
+
 export function sendJson(res: ServerResponse, status: number, body: unknown): void {
   const payload = JSON.stringify(body);
   res.writeHead(status, {
@@ -25,7 +36,7 @@ export function readJson(req: IncomingMessage): Promise<unknown> {
     req.on('data', (chunk: Buffer) => {
       size += chunk.length;
       if (size > MAX_BODY_BYTES) {
-        reject(new Error('corpo excede o tamanho máximo'));
+        reject(new HttpError(413, 'corpo excede o tamanho máximo'));
         req.destroy();
         return;
       }
@@ -37,7 +48,7 @@ export function readJson(req: IncomingMessage): Promise<unknown> {
       try {
         resolve(JSON.parse(Buffer.concat(chunks).toString('utf8')));
       } catch {
-        reject(new Error('JSON inválido'));
+        reject(new HttpError(400, 'JSON inválido'));
       }
     });
 
@@ -54,7 +65,7 @@ export interface Route {
 }
 
 /**
- * Roteador mínimo: casamento exato de método + caminho. São seis rotas — um
+ * Roteador mínimo: casamento exato de método + caminho. São poucas rotas — um
  * framework aqui traria dependência sem resolver problema nenhum.
  */
 export function createRouter(routes: Route[]): Handler {
@@ -70,8 +81,9 @@ export function createRouter(routes: Route[]): Handler {
       await handler(req, res);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      console.error(`[api] erro em ${req.method} ${path}:`, message);
-      if (!res.headersSent) sendError(res, 500, message);
+      const status = error instanceof HttpError ? error.status : 500;
+      if (status >= 500) console.error(`[api] erro em ${req.method} ${path}:`, message);
+      if (!res.headersSent) sendError(res, status, message);
     }
   };
 }

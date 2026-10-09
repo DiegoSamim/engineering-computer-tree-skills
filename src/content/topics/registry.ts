@@ -1,10 +1,13 @@
 import type { TopicContent } from './types';
+import { algoritmos } from './algoritmos';
 import { twoPointers } from './two-pointers';
 
-export const TOPIC_CONTENT: Record<string, TopicContent> = {
+/** Corpo das guias por slug do nó. Um nó `publicado` precisa estar aqui. */
+const TOPIC_CONTENT: Record<string, TopicContent> = {
+  algoritmos,
   'two-pointers': twoPointers,
 };
 
-export function getTopicContent(id: string): TopicContent | undefined {
-  return TOPIC_CONTENT[id];
+export function getTopicContent(slug: string): TopicContent | undefined {
+  return TOPIC_CONTENT[slug];
 }

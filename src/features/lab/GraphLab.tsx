@@ -41,11 +41,11 @@ export function GraphLab() {
 
       <main className="flex min-w-0 flex-col overflow-hidden">
         <div className="flex items-center justify-between border-b border-line px-4 py-2">
-          <Link to="/roadmap" className="text-[12px] text-ink-faint transition-colors hover:text-ink-muted">
-            ← Voltar ao roadmap
+          <Link to="/" className="text-[12px] text-ink-faint transition-colors hover:text-ink-muted">
+            ← Voltar ao mapa
           </Link>
           <span className="text-[11px] text-ink-faint">
-            Laboratório · será integrado como tópico do Nível 7
+            Laboratório · vai virar visualizador dos nós de Grafos
           </span>
         </div>
 

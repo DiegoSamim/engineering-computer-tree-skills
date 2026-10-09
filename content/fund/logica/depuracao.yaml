@@ -1,0 +1,31 @@
+slug: depuracao
+title: "Depuração e leitura de erros"
+home: fund/logica
+kind: conceito
+content: planejado
+max_level: 3
+est_minutes: 45
+summary: "Encontrar a causa de um erro: ler a mensagem, isolar o problema e provar a correção."
+place: { role: lateral, x: 0.12, y: 0.12 }
+requires:
+  - { node: rastreamento }
+  - { node: funcoes }
+levels:
+  - level: 1
+    name: Entendi
+    criteria:
+      - id: ler-stack-trace
+        label: "Leitura"
+        text: "Ler a mensagem de erro e o stack trace e achar a linha do problema."
+  - level: 2
+    name: Pratiquei
+    criteria:
+      - id: isolar-bug
+        label: "Isolamento"
+        text: "Isolar o bug com prints ou debugger e um caso mínimo."
+  - level: 3
+    name: Dominei
+    criteria:
+      - id: teste-reproduz
+        label: "Prova"
+        text: "Escrever um teste que reproduz o bug antes de corrigir."

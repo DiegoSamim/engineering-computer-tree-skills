@@ -3,7 +3,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { defineConfig, type Plugin } from 'vitest/config'
 
 /** Rotas do app que precisam servir o SPA, não um arquivo estático. */
-const SPA_ROUTES = ['/roadmap', '/topico', '/sinais', '/lab']
+const SPA_ROUTES = ['/a', '/n', '/lab']
 
 /**
  * O projeto tem HTMLs soltos na raiz (ex.: `roadmap.html`), e o servidor de

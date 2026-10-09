@@ -1,12 +1,6 @@
 import type { TopicContent } from './types';
 
 export const twoPointers: TopicContent = {
-  id: 'two-pointers',
-  name: 'Two Pointers',
-  glyph: '⇄',
-  tagline: 'Dois índices que se movem de forma coordenada, eliminando possibilidades a cada passo.',
-  badges: ['CORE', 'Nível 3 · Padrões de varredura', 'Arrays e Strings'],
-
   whatIsIt: [
     'Two Pointers é uma técnica que usa dois índices percorrendo uma estrutura — geralmente um array — de forma coordenada, em vez de testar todas as combinações com laços aninhados.',
     'A variante mais comum é a de extremos opostos: um ponteiro começa no início, outro no fim, e eles se aproximam. A cada passo, uma comparação decide qual dos dois mover. A outra variante é a de mesma direção, em que os dois avançam para a frente em velocidades diferentes.',
@@ -125,13 +119,13 @@ function removeDuplicates(nums: number[]): number {
     'Não tratar array vazio ou de um único elemento antes de entrar no laço.',
   ],
 
-  exercises: [
-    { id: 'two-sum-ii', name: 'Two Sum II — Input Array Is Sorted', difficulty: 'Fácil', why: 'O caso canônico. Se este não sai sem consulta, o padrão ainda não está automático.' },
-    { id: 'valid-palindrome', name: 'Valid Palindrome', difficulty: 'Fácil', why: 'Extremos opostos sem aritmética — mostra que o padrão não é só sobre somas.' },
-    { id: 'container-most-water', name: 'Container With Most Water', difficulty: 'Médio', why: 'Força a articular POR QUE descartar um lado é seguro. É o exercício que treina o argumento de correção.' },
-    { id: 'three-sum', name: '3Sum', difficulty: 'Médio', why: 'Two Pointers dentro de um laço externo, mais o tratamento de duplicados — a extensão natural.' },
-    { id: 'sort-colors', name: 'Sort Colors', difficulty: 'Médio', why: 'Partição com três ponteiros (Dutch National Flag). Amplia o padrão para além de dois índices.' },
-  ],
+  exerciseWhy: {
+    'two-sum-ii': 'O caso canônico. Se este não sai sem consulta, o padrão ainda não está automático.',
+    'valid-palindrome': 'Extremos opostos sem aritmética — mostra que o padrão não é só sobre somas.',
+    'container-most-water': 'Força a articular POR QUE descartar um lado é seguro. É o exercício que treina o argumento de correção.',
+    'three-sum': 'Two Pointers dentro de um laço externo, mais o tratamento de duplicados — a extensão natural.',
+    'sort-colors': 'Partição com três ponteiros (Dutch National Flag). Amplia o padrão para além de dois índices.',
+  },
 
   summary: [
     'Two Pointers troca laços aninhados por uma única varredura coordenada: O(n²) → O(n), com O(1) de memória.',
@@ -140,17 +134,6 @@ function removeDuplicates(nums: number[]): number {
     'O que se deve saber explicar na entrevista não é o código, é o invariante: por que mover aquele ponteiro nunca descarta a resposta.',
   ],
 
-  mastery: {
-    reconhecimento: 'Ver "par ou tripla em array ordenado" num enunciado novo e levantar Two Pointers sem receber o nome do tópico.',
-    modelagem: 'Enunciar o invariante: tudo fora do intervalo [left, right] já foi descartado com segurança.',
-    implementacao: 'Escrever o template de extremos opostos e o de fast/slow sem consultar nada.',
-    correcao: 'Explicar por que mover o ponteiro escolhido nunca pula a resposta — o argumento, não o passo a passo.',
-    complexidade: 'Justificar O(n) tempo / O(1) espaço, e lembrar do O(n log n) quando a ordenação faz parte da solução.',
-    validacao: 'Testar array vazio, um elemento, duplicados, nenhum par válido e o par nos extremos.',
-    retencao: 'Refazer Two Sum II e Container With Most Water dias depois, sem olhar a solução.',
-    performance: 'Resolver verbalizando o invariante e declarando a complexidade, dentro do tempo.',
-  },
-
   review: [
     { question: 'Por que o array precisa estar ordenado?', answer: 'Porque é a ordenação que garante que o valor em um extremo é o maior (ou menor) disponível. Sem isso, descartar esse extremo poderia estar jogando fora a resposta.' },
     { question: 'Se a soma é maior que o alvo, qual ponteiro se move e por quê?', answer: 'O right, para a esquerda. nums[right] é o maior valor restante; como todos os outros candidatos são ≥ nums[left], qualquer par com nums[right] será ≥ à soma atual, que já passou do alvo.' },
@@ -158,6 +141,4 @@ function removeDuplicates(nums: number[]): number {
     { question: 'Qual a vantagem sobre a solução com Hash Map?', answer: 'Memória: Two Pointers usa O(1) contra O(n) do Hash Map. Em troca, exige o array ordenado — o Hash Map funciona em array desordenado e preserva os índices originais.' },
     { question: 'Como o padrão muda na variante de mesma direção?', answer: 'Os dois ponteiros andam para frente em velocidades diferentes: slow marca a fronteira do resultado e fast varre. É a base do Sliding Window e de detecção de ciclo em linked list.' },
   ],
-
-  visualizer: 'two-pointers',
 };

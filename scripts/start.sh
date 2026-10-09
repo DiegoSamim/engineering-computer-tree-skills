@@ -103,6 +103,10 @@ start_watchdog() {
   WATCHDOG_PID=$!
 }
 
+# O catalogo (content/ -> src/generated/catalog.json) precisa existir antes
+# da API subir; se o conteudo estiver invalido, para aqui com a lista de erros.
+node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/build-catalog.ts
+
 # Node e Vite sao chamados direto (nao via npm) para que os PIDs capturados
 # sejam os processos reais — via npm, matar o wrapper deixaria orfaos.
 echo "Iniciando API na porta ${API_PORT}..."

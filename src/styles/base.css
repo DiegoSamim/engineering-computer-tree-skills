@@ -1,0 +1,367 @@
+/* Base, barra superior e controles compartilhados (Button, StatePill, pips, Check, Toast). */
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  :focus-visible {
+    outline: 1.5px solid var(--c);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: var(--soft);
+    color: var(--color-ink);
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line-strong) transparent;
+  }
+}
+
+@layer components {
+  /* ── Casca ──────────────────────────────────────────────────────────── */
+  .shell {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .star-field {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    transition: opacity var(--t-slow) var(--ease);
+  }
+  [data-view='node'] .star-field {
+    opacity: 0.18;
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    animation: view-in var(--t-slow) var(--ease) both;
+  }
+  @keyframes view-in {
+    from {
+      opacity: 0;
+      transform: scale(0.985);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .eyebrow {
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: var(--color-ink-faint);
+  }
+  .mono {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Barra superior ─────────────────────────────────────────────────── */
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: calc(14px + env(safe-area-inset-top, 0px)) 24px 14px;
+    font-size: 13px;
+    color: var(--color-ink-faint);
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--color-ink-muted);
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+  .brand svg {
+    width: 20px;
+    height: 20px;
+  }
+  .crumbs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .crumbs a {
+    color: var(--color-ink-faint);
+    white-space: nowrap;
+    transition: color var(--t-fast);
+  }
+  .crumbs a:hover {
+    color: var(--color-ink);
+  }
+  .crumbs .sep {
+    opacity: 0.5;
+  }
+  .crumbs .here {
+    color: var(--color-ink-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .topbar .total {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .topbar .total b {
+    color: var(--color-ink);
+    font-weight: 500;
+  }
+
+  /* ── Tela de status (carregando, sem conexão) ───────────────────────── */
+  .status-screen {
+    flex: 1;
+    display: grid;
+    place-items: center;
+    padding: 24px 16px;
+  }
+  .status-screen .box {
+    max-width: 460px;
+  }
+  .status-screen h1 {
+    margin: 10px 0 8px;
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: 26px;
+    line-height: 1.2;
+  }
+  .status-screen p {
+    margin: 0 0 18px;
+    color: var(--color-ink-muted);
+    font-size: 14px;
+  }
+  .status-screen .loading {
+    color: var(--color-ink-faint);
+    font-size: 13px;
+    letter-spacing: 0.12em;
+  }
+  .save-error {
+    position: fixed;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 14px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-danger);
+    background: var(--color-bg-raised);
+    font-size: 13px;
+    color: var(--color-ink-muted);
+  }
+  .save-error b {
+    color: var(--color-danger);
+    font-weight: 500;
+  }
+
+  /* ── Button ─────────────────────────────────────────────────────────── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 18px;
+    border-radius: var(--radius-md);
+    border: 1px solid color-mix(in srgb, var(--c) 55%, transparent);
+    color: var(--c);
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition:
+      background var(--t-fast),
+      box-shadow var(--t-fast),
+      color var(--t-fast);
+  }
+  .btn:hover {
+    background: var(--soft);
+    box-shadow: 0 0 18px var(--glow);
+  }
+  .btn svg {
+    width: 16px;
+    height: 16px;
+  }
+  .btn.ghost {
+    border-color: var(--color-line-strong);
+    color: var(--color-ink-muted);
+  }
+  .btn.ghost:hover {
+    color: var(--color-ink);
+    background: var(--color-bg-panel);
+    box-shadow: none;
+  }
+
+  /* ── StatePill e pips ───────────────────────────────────────────────── */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    line-height: 1.5;
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-line-strong);
+    color: var(--color-ink-muted);
+  }
+  .pill .d {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-ink-faint);
+  }
+  .pill.on {
+    border-color: color-mix(in srgb, var(--c) 45%, transparent);
+    color: var(--c);
+  }
+  .pill.on .d {
+    background: var(--c);
+    box-shadow: 0 0 6px var(--c);
+  }
+
+  .pips {
+    display: inline-flex;
+    gap: 5px;
+    vertical-align: middle;
+  }
+  .pips i {
+    width: 16px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--color-line-strong);
+    transition: background var(--t-med);
+  }
+  .pips i.on {
+    background: var(--c);
+    box-shadow: 0 0 6px var(--glow);
+  }
+  .pips-label {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-ink-faint);
+    margin-left: 8px;
+  }
+
+  /* ── Check ──────────────────────────────────────────────────────────── */
+  .check {
+    flex: 0 0 18px;
+    width: 18px;
+    height: 18px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--color-line-strong);
+    display: grid;
+    place-items: center;
+    transition: all var(--t-fast);
+  }
+  .check svg {
+    width: 12px;
+    height: 12px;
+    opacity: 0;
+    color: var(--color-bg);
+  }
+  .check.on {
+    background: var(--c);
+    border-color: var(--c);
+    box-shadow: 0 0 10px var(--glow);
+  }
+  .check.on svg {
+    opacity: 1;
+  }
+
+  /* ── Toast ──────────────────────────────────────────────────────────── */
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    z-index: 30;
+    transform: translate(-50%, 20px);
+    opacity: 0;
+    padding: 10px 18px;
+    border-radius: var(--radius-full);
+    background: var(--color-bg-panel);
+    border: 1px solid color-mix(in srgb, var(--c) 45%, transparent);
+    color: var(--color-ink);
+    font-size: 13.5px;
+    box-shadow: 0 0 24px var(--glow);
+    transition: all var(--t-med) var(--ease);
+    pointer-events: none;
+  }
+  .toast.on {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  @media (max-width: 640px) {
+    .topbar {
+      padding-inline: 16px;
+    }
+    .topbar .total,
+    .brand span {
+      display: none;
+    }
+  }
+
+  /* Movimento reduzido: tudo vira instantâneo. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 1ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 1ms !important;
+    }
+  }
+}

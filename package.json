@@ -1,17 +1,22 @@
 {
-  "name": "grafos",
+  "name": "engineering-computer-tree-skills",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "predev": "npm run catalog",
     "dev": "vite",
+    "prebuild": "npm run catalog",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
+    "pretest": "npm run catalog --silent",
     "test": "vitest run",
+    "preserver": "npm run catalog",
     "server": "node --experimental-strip-types --disable-warning=ExperimentalWarning server/index.ts",
     "dev:api": "npm run server",
-    "start": "./scripts/start.sh"
+    "start": "./scripts/start.sh",
+    "catalog": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/build-catalog.ts"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
@@ -30,6 +35,7 @@
     "oxlint": "^1.79.0",
     "typescript": "~6.0.2",
     "vite": "^8.2.2",
-    "vitest": "^5.0.0"
+    "vitest": "^5.0.0",
+    "yaml": "^2.9.1"
   }
 }
