@@ -34,7 +34,7 @@ describe('tokens do design system em src/index.css', () => {
 describe('nenhuma cor literal em componente', () => {
   // Telas e peças da árvore. O lab de grafos (src/features/lab, src/components)
   // tem cores próprias e fica de fora até virar visualizador.
-  const DIRS = ['src/ui', 'src/app', 'src/features/sky', 'src/features/area', 'src/features/branch', 'src/features/node'];
+  const DIRS = ['src/ui', 'src/app', 'src/features/sky', 'src/features/area', 'src/features/branch', 'src/features/node', 'src/visualizers'];
   const files = DIRS.filter((dir) => existsSync(join(ROOT, dir))).flatMap((dir) =>
     (readdirSync(join(ROOT, dir), { recursive: true }) as string[])
       .filter((f) => f.endsWith('.tsx'))

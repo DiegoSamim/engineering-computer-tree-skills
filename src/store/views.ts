@@ -253,3 +253,10 @@ export function firstBranchWithNodes(index: CatalogIndex, area: string): number 
   const branches = index.branchesByArea.get(area) ?? [];
   return Math.max(0, branches.findIndex((b) => (index.placementsByBranch.get(b.key) ?? []).length > 0));
 }
+
+/** O que um nó libera e a partir de qual nível ("Ao chegar no nível 2, Sliding Window é liberado"). */
+export function unlockHints(index: CatalogIndex, slug: string): { title: string; minLevel: number }[] {
+  return index.catalog.nodes.flatMap((n) =>
+    n.requires.filter((r) => r.node === slug && r.strength === 'obrigatorio').map((r) => ({ title: n.title, minLevel: r.minLevel })),
+  );
+}

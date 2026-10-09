@@ -1,62 +1,104 @@
-import { useMemo, useState } from 'react';
-import { buildTwoPointersTrace } from './run';
-import { TwoPointersCanvas } from './TwoPointersCanvas';
+import { useMemo, useState, type CSSProperties } from 'react';
 import { usePlayer } from '../../player/usePlayer';
-import { PlayerControls } from '../../player/PlayerControls';
-import { Timeline } from '../../player/Timeline';
-import { StepExplanation } from '../../player/StepExplanation';
+import { Icon } from '../../ui/Icon';
+import { buildTwoPointersTrace } from './run';
 
 const PRESETS = [
-  { label: 'Two Sum II', nums: [1, 2, 3, 4, 6, 8, 9, 11], target: 9 },
-  { label: 'Alvo nos extremos', nums: [2, 3, 5, 7, 8, 14], target: 16 },
-  { label: 'Sem solução', nums: [1, 2, 3, 4], target: 100 },
+  { nums: [1, 2, 3, 4, 6, 8, 9, 11], target: 9 },
+  { nums: [1, 3, 4, 5, 7, 10, 11], target: 9 },
 ];
 
 /**
- * Reusa exatamente o mesmo player do laboratório de grafos — controles,
- * timeline e painel de explicação. A única coisa específica deste tópico é
- * o canvas e o gerador de passos.
+ * Two Pointers de extremos opostos, passo a passo. A lógica é a de
+ * `run.ts` (comparar é um passo, mover é outro); aqui só se desenha.
  */
 export function TwoPointersVisualizer() {
-  const [presetIndex, setPresetIndex] = useState(0);
-  const preset = PRESETS[presetIndex];
-
-  const trace = useMemo(() => buildTwoPointersTrace(preset.nums, preset.target), [preset]);
+  const [preset, setPreset] = useState(0);
+  const { nums, target } = PRESETS[preset];
+  const trace = useMemo(() => buildTwoPointersTrace(nums, target), [nums, target]);
   const player = usePlayer(trace.steps.length - 1);
-  const step = trace.steps[Math.min(player.stepIndex, trace.steps.length - 1)];
+  const step = trace.steps[player.stepIndex];
+  const { left, right, sum, found } = step.state;
+
+  const cellClass = (i: number) => {
+    if (found?.includes(i)) return 'cell found';
+    const gone = i < left || i > right;
+    const hit = sum !== undefined && (i === left || i === right);
+    return `cell ${gone ? 'gone' : ''} ${hit && !gone ? 'hit' : ''}`;
+  };
+
+  const choose = (i: number) => {
+    setPreset(i);
+    player.toStart();
+  };
 
   return (
-    <div className="max-w-[860px] border border-line" style={{ background: 'var(--bg-raised)' }}>
-      <div className="flex flex-wrap items-center gap-2 border-b border-line px-4 py-2.5">
-        <span className="font-mono-num text-[11px] uppercase tracking-wide text-ink-faint">Exemplo</span>
-        {PRESETS.map((p, i) => (
-          <button
-            key={p.label}
-            type="button"
-            onClick={() => {
-              setPresetIndex(i);
-              player.toStart();
-            }}
-            className="border px-2.5 py-1 text-[11.5px] transition-colors"
-            style={
-              i === presetIndex
-                ? { borderColor: 'var(--color-accent)', color: 'var(--color-accent)', background: 'var(--color-accent-soft)' }
-                : { borderColor: 'var(--border)', color: 'var(--text-muted)' }
-            }
-          >
-            {p.label}
+    <>
+      <div className="viz">
+        <div className="viz-top">
+          <div className="seg" role="tablist" aria-label="Exemplo">
+            {PRESETS.map((p, i) => (
+              <button
+                key={i}
+                type="button"
+                role="tab"
+                aria-selected={i === preset}
+                className={i === preset ? 'on' : ''}
+                onClick={() => choose(i)}
+              >
+                Alvo {p.target} · {p.nums.length} itens
+              </button>
+            ))}
+          </div>
+          <span>
+            target = <b>{target}</b>
+          </span>
+        </div>
+
+        <div className="arr-wrap">
+          <div className="arr">
+            {nums.map((v, i) => (
+              <div key={i} className={cellClass(i)}>
+                <span className="ix">{i}</span>
+                {v}
+              </div>
+            ))}
+            <div className="ptr" style={{ '--p': left } as CSSProperties}>
+              left
+            </div>
+            <div className="ptr r" style={{ '--p': right } as CSSProperties}>
+              right
+            </div>
+          </div>
+        </div>
+
+        <div className="narr" aria-live="polite">
+          <h4>{step.narration.title}</h4>
+          <p>{step.narration.text}</p>
+        </div>
+
+        <div className="ctrl">
+          <button type="button" className="ic" aria-label="Reiniciar" onClick={player.toStart}>
+            <Icon name="reset" />
           </button>
-        ))}
+          <button type="button" className="ic" aria-label="Passo anterior" onClick={player.prev}>
+            <Icon name="left" />
+          </button>
+          <button type="button" className="ic" aria-label={player.playing ? 'Pausar' : 'Reproduzir'} onClick={player.toggle}>
+            <Icon name={player.playing ? 'pause' : 'play'} />
+          </button>
+          <button type="button" className="ic" aria-label="Próximo passo" onClick={player.next}>
+            <Icon name="right" />
+          </button>
+          <div className="scrub" aria-hidden="true">
+            <i style={{ width: `${(player.stepIndex / Math.max(1, player.maxIndex)) * 100}%` }} />
+          </div>
+          <span className="stepn">
+            {player.stepIndex + 1} / {trace.steps.length}
+          </span>
+        </div>
       </div>
-
-      <TwoPointersCanvas nums={trace.nums} target={trace.target} state={step.state} />
-
-      <div className="border-t border-line">
-        <StepExplanation narration={step.narration} stepIndex={player.stepIndex} maxIndex={player.maxIndex} />
-      </div>
-
-      <Timeline trace={trace} player={player} />
-      <PlayerControls player={player} />
-    </div>
+      <p className="guide-note">Comparar é um passo, mover é outro. Duas decisões nunca acontecem na mesma animação.</p>
+    </>
   );
 }
