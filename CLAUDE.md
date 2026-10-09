@@ -34,12 +34,25 @@ Em caso de conflito: este arquivo > `docs/db/schema.sql` > design system > prot�
 - **Log de eventos** (`progress_event`, só INSERT) é a fonte da verdade do progresso; `user_node` é estado materializado. XP vai para a área-casa do nó, nunca duplicado por espelho.
 - **Trilhas** (`track`) são caminhos ordenados por objetivo que atravessam áreas. O roadmap de live coding atual vira a primeira trilha.
 - **Slugs são permanentes.** O progresso depende deles. Renomear exige tabela de apelidos; evite.
+- **Nó sem critérios não evolui.** Sem `node_criterion`, o nível fica em 0 e o nó só pode ser iniciado (`estudando`). Se o nó tem critérios, todo nível de 1 a `max_level` precisa de pelo menos um.
+- **XP**: `criterio_marcado` +10, `criterio_desmarcado` −10, demais eventos 0 (`xpFor` em `src/domain/tree`). Marcar o que já está marcado não grava evento.
+
+### Desvios de `docs/db/schema.sql` (decididos)
+
+- `branch`: `UNIQUE(area_id, slug)` em vez de `slug UNIQUE`, porque o catálogo repete slugs entre áreas. A chave pública é `area/branch`; as views expõem `branch_key`.
+- `node_criterion` e `exercise` ganham `slug` (estável, `UNIQUE(node_id, slug)`); critério ganha `label`. O seed faz upsert por (nó, slug) para não apagar progresso.
+- `node.visualizer TEXT`.
+- Eventos `guia_lida` / `guia_desmarcada` e tabela `user_guide` ("Marcar como lida").
+- Sem `PRAGMA` na migration (`openDatabase` liga as FKs).
+- Os slugs de `seed_exemplo.sql` (`fundamentos`, `eng-software`...) são antigos: vale `docs/catalogo.md`.
+- Requisito de branch sem nó de tronco é cumprido por vacuidade (como na view); a validação acusa `branch_sem_tronco`.
 
 ## Conteúdo (decidido)
 
 - O conteúdo vive no git, um arquivo por nó: `content/<area>/<branch>/<no>.mdx`, com frontmatter YAML.
 - Metadados de área e branch: `content/<area>/_area.yaml`, `content/<area>/<branch>/_branch.yaml`.
-- Um script (`scripts/build-catalog.ts`) lê o frontmatter, valida (as mesmas regras de `validate.sql`, inclusive ciclos), gera `src/generated/catalog.json` e semeia o catálogo do SQLite de forma idempotente por slug. O build falha se a validação falhar.
+- Um script (`scripts/build-catalog.ts`) lê o frontmatter, valida (as mesmas regras de `validate.sql`, inclusive ciclos) e gera `src/generated/catalog.json` (não versionado; os scripts npm `pre*` o regeneram). O servidor semeia o SQLite no boot a partir desse JSON, de forma idempotente por slug. O build falha se a validação falhar.
+- **Escopo inicial do conteúdo: só a área `fund` e a branch `fund/padroes`.** As outras áreas e branches de `docs/catalogo.md` entram depois.
 - Frontmatter de um nó (formato alvo; ajuste com justificativa se algo não couber):
 
 ```yaml
@@ -110,10 +123,13 @@ Mantém: React 19, TypeScript, Vite, Tailwind 4, Zustand, React Router, Vitest, 
 
 ## Fases
 
-0. **Build verde.** O `.gitignore` tem `data/`, que também ignora `src/data/`; esses arquivos nunca foram commitados e o repo não compila num clone limpo. Troque por `/data/`, recupere ou recrie `src/data/` e deixe testes e build verdes. Renomeie o pacote de `grafos` para `engineering-computer-tree-skills`.
-1. **Domínio e catálogo.** Tipos, `build-catalog.ts`, validação, derivação de estado em `src/domain/`. Porte os cenários de `docs/db/test_schema.py` para Vitest. Crie os arquivos `_area.yaml`/`_branch.yaml` das 10 áreas de `docs/catalogo.md`.
-2. **Banco.** Nova migration a partir de `docs/db/schema.sql`, seed do catálogo, rotas do servidor para ler catálogo + estado e gravar eventos. O progresso antigo é local e descartável: avise e não migre.
+Ordem atual: backend primeiro (0, 1, 2), depois um front mínimo (F), depois o resto (3 a 6). Plano detalhado: conversa de 2026-10-09.
+
+0. **Build verde e limpeza.** `.gitignore` com `/data/`. `src/data/` (nunca commitado) **não** é recriado: as telas antigas (roadmap, tópico, sinais, onboarding) e a camada de progresso antiga são apagadas. Ficam lab de grafos, algoritmos, simulação, player e Two Pointers (visualizador em `src/visualizers/twoPointers/`, conteúdo em `src/content/topics/`, guias em `src/features/node/legacy/`). Pacote renomeado para `engineering-computer-tree-skills`.
+1. **Domínio e catálogo.** Tipos, `build-catalog.ts`, validação, derivação de estado em `src/domain/tree/` (`src/domain/{types,graph}.ts` é o domínio do lab de grafos e fica onde está). Porte os cenários de `docs/db/test_schema.py` para Vitest. Conteúdo: `fund/_area.yaml`, `fund/padroes/_branch.yaml` e os nós da branch.
+2. **Banco.** Novo arquivo `data/skill-tree.db`, migration a partir de `docs/db/schema.sql` (com os desvios acima), seed do catálogo, rotas para ler catálogo + estado e gravar eventos. O progresso antigo (`data/study.db`) não é migrado: o boot avisa e deixa o arquivo intacto.
+F. **Front mínimo.** Rotas `/`, `/a/:area`, `/a/:area/:branch`, `/n/:slug` funcionando sobre a API, sem design system.
 3. **Design system no código.** Tokens, fontes, céu de estrelas de fundo, componentes base (`Button`, `StatePill`, pips, `StarNode`).
 4. **Telas de navegação.** Céu, carrossel, constelação + painel, rotas e transições.
 5. **Página do nó.** Guias, gaveta Domínio com critérios por nível, Two Pointers migrado para MDX com o visualizador no novo estilo.
-6. **Migração de conteúdo.** Tópicos de `src/content/roadmap.ts` viram nós `planejado` nas branches de Fundamentos; algoritmos do lab de grafos viram nós com visualizador; o roadmap vira a trilha "Live coding". Remova as telas antigas (roadmap, sinais, lab) só depois disso.
+6. **Migração de conteúdo.** As outras áreas e branches de `docs/catalogo.md`. Tópicos de `src/content/roadmap.ts` viram nós `planejado` nas branches de Fundamentos; algoritmos do lab de grafos viram nós com visualizador (e `src/domain/{types,graph}.ts` vai junto para `src/visualizers/`); o roadmap vira a trilha "Live coding" (`content/_trilhas/`). Remova o lab só depois disso.
