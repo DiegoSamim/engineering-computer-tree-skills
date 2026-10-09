@@ -2,7 +2,7 @@ slug: algoritmos
 title: "Algoritmos e decomposição"
 home: fund/logica
 kind: conceito
-content: planejado
+content: publicado
 max_level: 3
 est_minutes: 40
 summary: "Transformar um problema em passos claros que o computador executa: entrada, processamento e saída."
@@ -26,3 +26,10 @@ levels:
       - id: planejar-antes
         label: "Planejamento"
         text: "Escrever o passo a passo de um problema novo antes de começar a codar, sem pular etapas."
+exercises:
+  - { id: media-1, title: "Média 1", url: "https://judge.beecrowd.com/pt/problems/view/1005", difficulty: facil }
+  - { id: o-maior, title: "O Maior", url: "https://judge.beecrowd.com/pt/problems/view/1013", difficulty: facil }
+  - { id: cedulas, title: "Cédulas", url: "https://judge.beecrowd.com/pt/problems/view/1018", difficulty: facil }
+  - { id: idade-em-dias, title: "Idade em Dias", url: "https://judge.beecrowd.com/pt/problems/view/1020", difficulty: facil }
+  - { id: notas-e-moedas, title: "Notas e Moedas", url: "https://judge.beecrowd.com/pt/problems/view/1021", difficulty: medio }
+visualizer: decomposicao

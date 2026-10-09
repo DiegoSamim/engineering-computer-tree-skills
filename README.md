@@ -43,7 +43,7 @@ src/content/topics/<slug>.ts              o corpo das 12 guias de uma habilidade
 
 `npm run catalog` valida tudo (inclusive ciclos de requisitos) e gera `src/generated/catalog.json`. Ele roda sozinho antes de `dev`, `build`, `test` e `server`; se o conteúdo estiver inválido, para com a lista de erros. O servidor semeia o banco a partir desse arquivo no boot.
 
-Hoje o conteúdo cobre as 10 áreas e as 8 branches de Fundamentos (só metadados) e as habilidades de duas branches: **Lógica de programação** (12 habilidades com critérios; é a base que as outras exigem) e **Padrões de resolução** (9 habilidades, com Two Pointers completo).
+Hoje o conteúdo cobre as 10 áreas e as 8 branches de Fundamentos (só metadados) e as habilidades de duas branches: **Lógica de programação** (12 habilidades com critérios, a base que as outras exigem; Algoritmos e decomposição já completa, com visualizador) e **Padrões de resolução** (9 habilidades, com Two Pointers completo).
 
 ## Estrutura
 

@@ -1,4 +1,5 @@
 import { createElement, type ComponentType, type ReactElement } from 'react';
+import { DecompositionVisualizer } from './decomposicao/DecompositionVisualizer';
 import { TwoPointersVisualizer } from './twoPointers/TwoPointersVisualizer';
 
 /**
@@ -8,6 +9,7 @@ import { TwoPointersVisualizer } from './twoPointers/TwoPointersVisualizer';
  */
 const VISUALIZERS: Record<string, ComponentType> = {
   'two-pointers': TwoPointersVisualizer,
+  decomposicao: DecompositionVisualizer,
 };
 
 /** O visualizador do nó, ou null se a chave não existe no registry. */

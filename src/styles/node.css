@@ -648,6 +648,87 @@
     color: var(--color-ink-muted);
     font-size: 14px;
   }
+  /* Visualizador de decomposição: a árvore entrada → processamento → saída. */
+  .dtree {
+    margin-bottom: 18px;
+  }
+  .dnode {
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-md);
+    padding: 8px 12px;
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: var(--color-ink-muted);
+    background: var(--color-bg);
+    transition:
+      border-color var(--t-med) var(--ease),
+      color var(--t-med) var(--ease),
+      box-shadow var(--t-med) var(--ease),
+      opacity var(--t-med) var(--ease);
+  }
+  .dnode small {
+    display: block;
+    margin-top: 2px;
+    font-size: 12px;
+    color: var(--color-ink-faint);
+  }
+  .dnode.pending {
+    border-style: dashed;
+    color: var(--color-ink-faint);
+    opacity: 0.45;
+  }
+  .dnode.cur {
+    border-color: var(--c);
+    color: var(--color-ink);
+    box-shadow: 0 0 14px var(--glow);
+  }
+  .drow {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .dcol {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+    padding-left: 12px;
+    border-left: 1px solid var(--color-line-strong);
+  }
+  .mem {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 16px 28px;
+    margin-bottom: 6px;
+  }
+  .mem-notas {
+    --cell: 40px;
+    --gap: 8px;
+    display: flex;
+    gap: var(--gap);
+    padding-top: 18px;
+  }
+  .mem-notas .cell.done {
+    opacity: 0.45;
+  }
+  .vars {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 4px 14px;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
+  .vars dt {
+    color: var(--color-ink-faint);
+  }
+  .vars dd {
+    margin: 0;
+    color: var(--color-ink);
+  }
+
   .ctrl {
     display: flex;
     align-items: center;
@@ -737,7 +818,8 @@
   }
   @media (max-width: 640px) {
     .two,
-    .bigo {
+    .bigo,
+    .drow {
       grid-template-columns: 1fr;
     }
     .node-head .mastery-btn {

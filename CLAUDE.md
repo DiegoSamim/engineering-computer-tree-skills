@@ -87,7 +87,7 @@ levels:
 visualizer: two-pointers      # chave num registry, nunca um if
 ```
 
-- O corpo tem as **12 guias** do arquétipo `padrao`, nesta ordem e com estes ids: `visao-geral`, `intuicao`, `analogia`, `visualizacao`, `quando-usar`, `complexidade`, `exemplos`, `codigo`, `erros-comuns`, `exercicios`, `resumo`, `revisao`. No TS, cada guia é um campo de `TopicContent`; os ids ficam em `src/domain/tree/guides.ts`. Outros arquétipos (conceito, ferramenta, caso) terão conjuntos próprios mais tarde; não os invente agora.
+- O corpo tem as **12 guias** do arquétipo `padrao`, nesta ordem e com estes ids: `visao-geral`, `intuicao`, `analogia`, `visualizacao`, `quando-usar`, `complexidade`, `exemplos`, `codigo`, `erros-comuns`, `exercicios`, `resumo`, `revisao`. No TS, cada guia é um campo de `TopicContent`; os ids ficam em `src/domain/tree/guides.ts`. Outros arquétipos (conceito, ferramenta, caso) terão conjuntos próprios mais tarde; não os invente agora. Até lá, uma habilidade `conceito` publicada usa as mesmas 12 guias (é o caso de `algoritmos`, em que "Complexidade" é uma primeira noção de contar passos).
 - Visualizadores ficam em `src/visualizers/<chave>/` e são registrados num registry. Reaproveite o motor existente (`src/simulation/`, `src/player/`) e os algoritmos de grafos (`src/algorithms/`): eles viram visualizadores dos nós BFS, DFS, A* etc.
 
 ## Telas e rotas (decidido)
