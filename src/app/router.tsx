@@ -1,19 +1,28 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { GraphLab } from '../features/lab/GraphLab';
+import { AreaScreen } from '../features/area/AreaScreen';
+import { SkyScreen } from '../features/sky/SkyScreen';
+import { AppShell, NotFound } from './AppShell';
 
-/**
- * Durante a refatoração para a skill tree, só o lab de grafos continua no ar.
- * As telas da árvore (céu, área, branch, nó) entram na fase do front mínimo.
- */
 export function AppRouter() {
   return (
     <BrowserRouter>
-      <div className="h-full bg-surface text-ink">
-        <Routes>
-          <Route path="/lab/grafos" element={<GraphLab />} />
-          <Route path="*" element={<Navigate to="/lab/grafos" replace />} />
-        </Routes>
-      </div>
+      <Routes>
+        <Route element={<AppShell />}>
+          <Route index element={<SkyScreen />} />
+          <Route path="a/:area" element={<AreaScreen />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
+        {/* O lab de grafos tem layout próprio; vira visualizador de nós na Fase 6. */}
+        <Route
+          path="/lab/grafos"
+          element={
+            <div className="h-full bg-surface text-ink">
+              <GraphLab />
+            </div>
+          }
+        />
+      </Routes>
     </BrowserRouter>
   );
 }
